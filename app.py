@@ -18,3 +18,5 @@ class App:
     def update_frame(self):
         """Aktualisiert den Bildrahmen und zeigt ihn an."""
         pass
+
+
