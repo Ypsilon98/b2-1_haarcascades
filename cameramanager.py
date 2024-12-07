@@ -7,14 +7,14 @@ class CameraManager:
         self.running = False
 
     def detect_cameras(self):
-        # Erkennt verfügbare Kameras und gibt eine Liste der Indizes zurück.
-        cameras = []
-        for i in range(5):  # Check the first 5 indexes
+    #Erkennt verfügbare Kameras und gibt eine Liste der Indizes zurück.
+        available_cameras = []
+        for i in range(3):  # Teste nur die ersten 3 Kameras
             cap = cv2.VideoCapture(i)
             if cap.isOpened():
-                cameras.append(i)
+                available_cameras.append(i)
                 cap.release()
-        return cameras
+        return available_cameras
 
     def start_camera(self, camera_index=0):
         # Startet die Kamera mit dem angegebenen Index.
@@ -33,8 +33,10 @@ class CameraManager:
 
     def get_frame(self):
         # Liefert einen Frame von der Kamera.
-        if self.running and self.cap:
-            ret, frame = self.cap.read()
-            if ret:
-                return frame
-        return None
+        if self.cap is None or not self.cap.isOpened():
+            return False, None
+        ret, frame = self.cap.read()
+        if ret:
+            return ret, frame
+        else:
+            return False, None
