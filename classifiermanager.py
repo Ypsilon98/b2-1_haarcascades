@@ -25,7 +25,7 @@ class ClassifierManager:
         else:
             print("Kein Ordner ausgewählt!")
 
-#Testkommentar
+#Testkommentar Leon
 
     def detect_faces(self, frame):
         # Erkennt Gesichter in einem gegebenen Frame.
