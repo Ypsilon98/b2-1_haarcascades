@@ -30,5 +30,5 @@ class ClassifierManager:
     def detect_faces(self, frame):
         # Erkennt Gesichter in einem gegebenen Frame.
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = self.face_cascade.detectMultiScale(gray, scaleFactor=1.05, minNeighbors=5, minSize=(30, 30))
+        faces = self.face_cascade.detectMultiScale(gray, scaleFactor=1.05, minNeighbors=3, minSize=(30, 30))
         return faces
