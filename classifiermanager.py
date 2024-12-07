@@ -13,6 +13,7 @@ class ClassifierManager:
         if file_path:
             self.face_cascade = cv2.CascadeClassifier(file_path)
 
+
     def train_classifier(self):
         # Trainiert einen benutzerdefinierten Haar-Cascade Klassifizierer.
         # Beispiel-Logik für das Training eines Klassifizierers:
@@ -23,6 +24,8 @@ class ClassifierManager:
             print(f"Klassifizierer mit Daten aus {file_path} trainieren...")
         else:
             print("Kein Ordner ausgewählt!")
+
+#Testkommentar
 
     def detect_faces(self, frame):
         # Erkennt Gesichter in einem gegebenen Frame.
