@@ -26,6 +26,7 @@ class ClassifierManager:
             print("Kein Ordner ausgewählt!")
 
 #Testkommentar Yannic
+#Testkommentar Emelie
 
     def detect_faces(self, frame):
         # Erkennt Gesichter in einem gegebenen Frame.
