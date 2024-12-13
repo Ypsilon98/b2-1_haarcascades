@@ -27,6 +27,7 @@ class ClassifierManager:
 
 #Testkommentar Yannic
 #Testkommentar Emelie
+#Testkommentar Philipp
 
     def detect_faces(self, frame):
         # Erkennt Gesichter in einem gegebenen Frame.
