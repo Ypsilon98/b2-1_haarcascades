@@ -3,11 +3,10 @@ import cv2
 class CameraManager:
     def __init__(self):
         # Initialisiert den Kamera-Manager.
-        self.cap = None
-        self.running = False
+       pass
 
     def detect_cameras(self):
-    #Erkennt verfügbare Kameras und gibt eine Liste der Indizes zurück.
+    # Erkennt verfügbare Kameras und gibt eine Liste der Indizes zurück.
         available_cameras = []
         for i in range(3):  # Teste nur die ersten 3 Kameras
             cap = cv2.VideoCapture(i)

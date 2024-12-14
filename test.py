@@ -3,6 +3,7 @@ from tkinter import Label, Canvas, Button, filedialog, StringVar, ttk, Tk
 from PIL import Image, ImageTk
 from cameramanager import CameraManager
 from classifiermanager import ClassifierManager
+from filemanager import FileManager
 
 class TestApp:
     def __init__(self, root):
@@ -13,6 +14,7 @@ class TestApp:
         # Manager-Instanzen
         self.camera_manager = CameraManager()
         self.classifier_manager = ClassifierManager()
+        self.file_manager = FileManager()
 
         # GUI-Komponenten
         self.canvas = Canvas(root, width=640, height=480)

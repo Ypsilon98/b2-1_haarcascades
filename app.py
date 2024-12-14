@@ -3,62 +3,12 @@ from tkinter import Label, Canvas, Button, filedialog, StringVar, ttk
 from PIL import Image, ImageTk
 from cameramanager import CameraManager
 from classifiermanager import ClassifierManager
+from filemanager import FileManager
+
 
 class App:
     def __init__(self, root):
-        # Initialisiert die App und GUI-Komponenten.
-        self.root = root
-        self.root.title("Gesichtserkennung")
-
-        # Manager-Instanzen
-        self.camera_manager = CameraManager()
-        self.classifier_manager = ClassifierManager()
-
-        # GUI-Komponenten
-        self.canvas = Canvas(root, width=640, height=480)
-        self.canvas.pack()
-
-        # Info-Label
-        self.info_label = Label(root, text="Gesichtserkennung: Live oder Bild auswählen")
-        self.info_label.pack()
-
-        # Kamera-Auswahlmenü
-        self.camera_var = StringVar(value="Keine Kamera erkannt")
-        self.camera_selector = ttk.Combobox(root, textvariable=self.camera_var, state="readonly")
-        self.camera_selector.pack(pady=5)
-
-        self.btn_refresh_cameras = Button(root, text="Kameras Aktualisieren", command=self.refresh_camera_list)
-        self.btn_refresh_cameras.pack(pady=5)
-
-        # Modus-Auswahl
-        self.mode_var = StringVar(value="live")
-        self.mode_selector = ttk.Combobox(root, textvariable=self.mode_var, state="readonly")
-        self.mode_selector
-
-        self.mode_selector["values"] = ["live", "file"]
-        self.mode_selector.pack(pady=5)
-
-        # Buttons
-        self.btn_load_image = Button(root, text="Bild Laden", command=self.load_image_from_file)
-        self.btn_load_image.pack(pady=5)
-
-        self.btn_start_camera = Button(root, text="Live-Bild Starten", command=self.start_camera)
-        self.btn_start_camera.pack(pady=5)
-
-        self.btn_stop_camera = Button(root, text="Kamera Stoppen", command=self.stop_camera)
-        self.btn_stop_camera.pack(pady=5)
-
-        self.btn_train_classifier = Button(root, text="Klassifizierer Trainieren", 
-                                           command=self.classifier_manager.train_classifier)
-        self.btn_train_classifier.pack(pady=5)
-
-        self.face_count_label = Label(root, text="Erkannte Gesichter: 0")
-        self.face_count_label.pack(pady=10)
-
-        # Variablen
-        self.current_frame = None
-        self.static_image = None
-        self.refresh_camera_list()  # Beim Start Kameras aktualisieren
+        pass
 
     def refresh_camera_list(self):
         # Aktualisiert die Kameraliste und zeigt verfügbare Kameras an.
@@ -95,15 +45,17 @@ class App:
     def load_image_from_file(self):
         # Lädt ein Bild von der Festplatte und zeigt es an.
         print("Lade Bild von Datei...")
-        file_path = filedialog.askopenfilename(title="Bild auswählen",
-                                               filetypes=(("Bilder", "*.jpg;*.png;*.jpeg"), ("Alle Dateien", "*.*")))
+
+        file_path = self.file_manager.open_file_dialog(title="Bild auswählen")
+        
         if file_path:
             image = cv2.imread(file_path)
             if image is not None:
                 self.static_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 print(f"Bild {file_path} erfolgreich geladen.")
+                self.update_frame()  # Bild anzeigen
             else:
-                print(f"Fehler beim Laden des Bildes {file_path}.")
+                print(f"Fehler: Bild {file_path} konnte nicht gelesen werden.")
         else:
             print("Kein Bild ausgewählt.")
 
