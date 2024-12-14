@@ -187,7 +187,7 @@ class CameraManager:
         self.running = False
 
     def detect_cameras(self):
-    #Erkennt verfügbare Kameras und gibt eine Liste der Indizes zurück.
+    # Erkennt verfügbare Kameras und gibt eine Liste der Indizes zurück.
         available_cameras = []
         for i in range(3):  # Teste nur die ersten 3 Kameras
             cap = cv2.VideoCapture(i)
