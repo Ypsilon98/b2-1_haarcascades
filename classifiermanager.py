@@ -26,6 +26,7 @@ class ClassifierManager:
             print("Kein Ordner ausgewählt!")
 
 #Testkommentar Yannic
+#Testkommentar Leon
 #Testkommentar Emelie
 #Testkommentar Philipp
 
