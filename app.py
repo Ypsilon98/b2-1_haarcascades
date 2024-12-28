@@ -5,9 +5,41 @@ from cameramanager import CameraManager
 from classifiermanager import ClassifierManager
 from filemanager import FileManager
 
+
+#
+# APP.PY - Graphische Benutzeroberfläche 
+#
+# Installiere Bibliothek "PySide 6": pip install PySide6
+#
+# Imports
+import sys 
+from PySide6.QtWidgets import QApplication, QWidget
+#
+# Test
+app = QApplication(sys.argv)
+
+window = QWidget()
+window.show()
+
+app.exec()
+#
+#
+
+
 class App:
     def __init__(self, root):
-        # Initialisiert die App und GUI-Komponenten.
+        # Initialisiert die Andwendung und die GUI-Komponenten
+        # 
+        # 
+        # 
+        self.root = root
+        self.root.title("Gesichtserkennung")
+
+        # Manager-Instanzen
+        self.camera_manager = CameraManager()
+        self.classifier_manager = ClassifierManager()
+        self.file_manager = FileManager()
+
         pass
 
     def refresh_camera_list(self):
