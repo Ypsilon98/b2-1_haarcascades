@@ -39,7 +39,7 @@ class CameraManager:
 
     def get_frame(self):
         # Liefert einen Frame von der Kamera.
-        if self.cap is not None and self.cap.isOpended():
+        if self.cap is not None and self.cap.isOpened():
             ret, frame = self.cap.read()
             if ret:
                 return frame, True
