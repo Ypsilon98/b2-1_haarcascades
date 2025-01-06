@@ -1,5 +1,5 @@
 import cv2
-from tkinter import filedialog
+#from tkinter import filedialog
 
 class ClassifierManager:
     def __init__(self):

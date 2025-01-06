@@ -5,7 +5,6 @@ class CameraManager:
         # Initialisiert den Kamera-Manager.
         self.cap = None
     
-
     def detect_cameras(self):
         # Erkennt verfügbare Kameras und gibt eine Liste der Indizes zurück.
         # Testet nur die ersten drei Kameras
@@ -28,14 +27,11 @@ class CameraManager:
             print (f"Fehler: Kamera mit ID {camera_id} konnte nicht geöffnet werden")
             return None
         
-
-
     def stop_camera(self):
         # Stoppt die Kamera und gibt Ressourcen frei.
         if self.cap is not None and self.cap.isOpened():
             self.cap.release()
             print("Kamera erfolgreich geschlossen")
-
 
     def get_frame(self):
         # Liefert einen Frame von der Kamera.

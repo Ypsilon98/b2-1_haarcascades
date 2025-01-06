@@ -1,5 +1,4 @@
 import cv2
-#from tkinter import Label, Canvas, Button, filedialog, StringVar, ttk
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QLabel, QComboBox, QPushButton,
     QVBoxLayout, QHBoxLayout, QGridLayout, QWidget, QSizePolicy
