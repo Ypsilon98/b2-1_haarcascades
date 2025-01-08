@@ -6,7 +6,6 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QPixmap, QImage
 from PySide6.QtCore import QTimer, Qt
 import numpy as np
-from PIL import Image, ImageTk
 from cameramanager import CameraManager
 from classifiermanager import ClassifierManager
 from filemanager import FileManager
