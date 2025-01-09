@@ -10,7 +10,37 @@ from filemanager import FileManager
 
 # Hauptklasse App für GUI
 class App(QMainWindow):
+    """
+    Hauptklasse für die GUI-Anwendung.
+
+    Attributes: camera_manager (CameraManager): Instanz des CameraManager.
+                classifier_manager (ClassifierManager): Instanz des ClassifierManager.
+                file_manager (FileManager): Instanz des FileManager.
+
+                central_widget (QWidget): Zentrales Widget der GUI.
+                status (QStatusBar): Statusleiste der GUI.
+                image_display (QLabel): Anzeigebereich für Bilder/Kamera.
+                info_label (QLabel): Info-Label für Statusmeldungen.
+
+                btn_refresh_cameras (QPushButton): Button zum Aktualisieren der Kameras.
+                btn_load_image (QPushButton): Button zum Laden von Bildern/Videos.
+                btn_start_camera (QPushButton): Button zum Starten/Stoppen der Kamera.
+                btn_stop_camera (QPushButton): Button zum Stoppen der Kamera.
+                btn_train_classifier (QPushButton): Button zum Trainieren des Klassifizierers.
+                camera_selector (QComboBox): Dropdown-Liste für Kameras.
+                mode_selector (QComboBox): Dropdown-Liste für Modusauswahl.
+                
+                face_count_label (QLabel): Anzeige für erkannte Gesichter.
+
+                timer (QTimer): Timer für die Aktualisierung der Frames.
+                
+                current_frame (np.ndarray): Aktuelles Frame der Kamera.
+                static_image (np.ndarray): Statisches Bild/Video
+
+    Methods: __init__, load_stylesheet, refresh_camera_list, start_camera, stop_camera, start_stop_camera, load_image_from_file, update_frame
+    """
     def __init__(self):
+        """Initialisiert die GUI und die Manager-Instanzen."""	
         super().__init__()
         
         # Manager Instanzen
@@ -125,7 +155,11 @@ class App(QMainWindow):
 
 
     def load_stylesheet(self, filename):
-        """Load the stylesheet from the given file and apply it."""
+        """
+        Lädt ein Stylesheet aus einer Datei.
+
+        Parameters: filename (str): Dateiname des Stylesheets.
+        """
         try:
             with open(filename, "r") as file:
                 self.setStyleSheet(file.read())
@@ -134,7 +168,9 @@ class App(QMainWindow):
 
 
     def refresh_camera_list(self):
-        # Aktualisiert die Kameraliste und zeigt verfügbare Kameras an.
+        """
+        Aktualisiert die Liste der verfügbaren Kameras.
+        """
         available_cameras = self.camera_manager.detect_cameras()
         self.camera_selector.clear()
         if available_cameras:
@@ -156,7 +192,9 @@ class App(QMainWindow):
         pass
             
     def start_camera(self):
-        # Startet die Kamera und den Live-Modus.
+        """
+        Startet die Kamera.
+        """
         print("Versuche, die Kamera zu starten...")
         camera_index = self.camera_selector.currentIndex()  # Kamera-Index auswählen
         try:
@@ -175,7 +213,9 @@ class App(QMainWindow):
         pass
 
     def stop_camera(self):
-        # Stoppt die Kamera.
+        """
+        Stoppt die Kamera.
+        """
         self.btn_refresh_cameras.setEnabled(True)
         self.btn_start_camera.setProperty("status","start")
         self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
@@ -190,6 +230,9 @@ class App(QMainWindow):
         pass
 
     def start_stop_camera(self,checked):
+        """
+        Startet oder stoppt die Kamera, je nach Status des Buttons.
+        """
         if checked:                 #self.btn_start_camera.isChecked():
             self.start_camera()
             print("Kamera gestartet")
@@ -200,47 +243,37 @@ class App(QMainWindow):
 
 
     def load_image_from_file(self):
-        # Lädt ein Bild von der Festplatte und zeigt es an.
+        """
+        Lädt ein Bild oder Video aus einer Datei.
+        """
         pass
 
     def update_frame(self):
-        # Holt ein Frame von der Kamera und zeigt es in der GUI an.
-         # Get frame from the camera if we're in live mode
+        """ Holt ein Frame von der Kamera und zeigt es in der GUI an. """
         if self.mode_selector.currentText() == "live":
             frame, ret = self.camera_manager.get_frame()
-            if not ret:
+            if not ret: # Wenn Kamera keine Frames mehr liefert/disconnected, stoppe Kamera und aktualisiere Kamera-Liste
                 self.stop_camera()
                 self.refresh_camera_list()
                 self.btn_start_camera.setChecked(False)
-                return  # If no frame, do nothing
+                return  
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, umwandlung in RGB
 
-        # Convert the frame from BGR to RGB
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        height, width, channel = frame.shape # Größe des Frames
+        aspect_ratio = height/width # Seitenverhältnis
+        bytes_per_line = 3 * width  # 3 Kanäle pro Pixel (RGB)
 
-        # Convert the frame to QImage
-        height, width, channel = frame.shape
-        
-        aspect_ratio = height/width
+        q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888) # Erstelle QImage aus Frame 
+        pixmap = QPixmap.fromImage(q_image) # Erstelle Pixmap aus QImage
 
-        bytes_per_line = 3 * width
-        q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888)
-        # Assuming q_image is your QImage object
-        pixmap = QPixmap.fromImage(q_image)
-
-        i_h = self.image_display.height()
-        w_asp = int(i_h * (width/height))
-
-        if(w_asp <= self.image_display.width()):
-            i_w = w_asp
+        # Logik für das Skalieren des Bildes
+        i_h = self.image_display.height() # Höhe des QLabel(image_display)
+        w_asp = int(i_h * (width/height)) # Berechne Breite des Bildes basierend auf Höhe und Seitenverhältnis
+        if(w_asp <= self.image_display.width()): 
+            i_w = w_asp 
         else:
             i_w = self.image_display.width()
             i_h = int(i_w * aspect_ratio)
-
-        #i_w = self.image_display.width()
-
-        # Scale the pixmap to fit the display size
-        scaled_pixmap = pixmap.scaled(i_w,i_h)
-
-        # Set the scaled pixmap to the image display
-        self.image_display.setPixmap(scaled_pixmap)
+        scaled_pixmap = pixmap.scaled(i_w,i_h) 
+        self.image_display.setPixmap(scaled_pixmap) # Setze Pixmap in QLabel(image_display)
         pass
