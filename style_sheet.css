@@ -1,0 +1,44 @@
+QMainWindow {
+    font-family: 'Segoe UI';
+    font-size: 14px;
+    background-color: white;
+}
+
+QLabel {
+    font-family: 'Segoe UI';
+    font-size: 14px;
+}
+
+QPushButton {
+    font-family: 'Segoe UI';
+    font-size: 14px;
+    background-color: #0078D7; /* Microsoft Blue */
+    color: white;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+QPushButton:hover {
+    background-color: #005a9e; /* Darker Microsoft Blue */
+}
+
+QPushButton:disabled {
+    background-color: gray; 
+}
+
+QPushButton[status="start"] {
+    background-color: green;
+}
+
+QPushButton[status="stop"] {
+    background-color: red;
+}
+
+QPushButton[status="unavailable"] {
+    background-color: gray;
+}
+
+QComboBox {
+    font-family: 'Segoe UI';
+    font-size: 14px;
+}

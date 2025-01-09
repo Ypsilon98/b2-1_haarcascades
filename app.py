@@ -1,8 +1,6 @@
 import cv2
-from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QLabel, QComboBox, QPushButton,
-    QVBoxLayout, QHBoxLayout, QGridLayout, QWidget, QSizePolicy,QStatusBar
-)
+from PySide6.QtWidgets import QMainWindow, QWidget, QPushButton, QLabel, QComboBox, QStatusBar
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QSizePolicy 
 from PySide6.QtGui import QPixmap, QImage
 from PySide6.QtCore import QTimer, Qt
 import numpy as np
@@ -14,52 +12,21 @@ from filemanager import FileManager
 class App(QMainWindow):
     def __init__(self):
         super().__init__()
-
-        self.setWindowTitle("Gesichtserkennung mit Haarcascades")
-        self.setStyleSheet("""
-            QMainWindow {
-        background-color: #f0f0f0;
-        }
-        QLabel {
-        font-size: 14px;
-        }
-        QPushButton {
-            font-size: 14px;
-            background-color: #0078D7;
-            color: white;
-            border-radius: 5px;
-            padding: 5px;
-        }
-        QPushButton:hover {
-            background-color: #005a9e;
-        }
-        QPushButton:disabled {
-            background-color: gray; 
-        }
         
-        QPushButton[status="start"] {
-        background-color: green;
-        }
-        QPushButton[status="stop"] {
-        background-color: red;
-        }
-        
-        QPushButton[status="unavailable"] {
-        background-color: gray;
-        }
-        
-        QComboBox {
-            font-size: 14px;
-        }
-        """)
         # Manager Instanzen
         self.camera_manager = CameraManager()
         #self.classifier_manager = ClassifierManager()
         #self.file_manager = FileManager()
-        # Set the minimum window size (width, height)
-        #self.setMinimumSize(300, 300)  # Minimum size is 800x600 pixels
-        self.setGeometry(100, 100, 1000, 700)  # Default window size
 
+        self.setWindowTitle("Gesichtserkennung mit Haarcascades")   # Fenstertitel
+        self.setGeometry(100, 100, 1000, 700)  # Default Fenstergröße festlegen
+
+        try:    # Versuche Stylesheet zu laden
+            self.load_stylesheet("style_sheet.css")
+            self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
+        except: # Fehlerbehandlung beim Laden des Stylesheets
+            print("Fehler beim Laden des Stylesheets, stelle sicher das du im richtigen Verzeichnis ../b2-1_haarcascades/main.py startest")
+            
         # Central Widget
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
@@ -144,13 +111,10 @@ class App(QMainWindow):
         # Add Control Panel to Main Layout
         main_layout.addLayout(control_panel)
 
-        # Stretch Factors
-        #main_layout.setStretch(0, 5)  # Image display gets the most space
-        #main_layout.setStretch(1, 2)  # Control panel takes less space
-
         # Timer for Updating Frames
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
+
 
         # Variables
         self.current_frame = None
@@ -158,6 +122,16 @@ class App(QMainWindow):
 
         # Automatically refresh camera list when the GUI starts
         self.btn_refresh_cameras.click()
+
+
+    def load_stylesheet(self, filename):
+        """Load the stylesheet from the given file and apply it."""
+        try:
+            with open(filename, "r") as file:
+                self.setStyleSheet(file.read())
+        except FileNotFoundError:
+            print(f"Error: Stylesheet file '{filename}' not found.")
+
 
     def refresh_camera_list(self):
         # Aktualisiert die Kameraliste und zeigt verfügbare Kameras an.
@@ -172,21 +146,19 @@ class App(QMainWindow):
             self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
             self.btn_start_camera.style().polish(self.btn_start_camera)    # Reapply style
         else:
-            try:
-                self.camera_selector.addItem("Keine Kamera erkannt")
-                self.status.showMessage("Keine Kameras gefunden.")
-                self.btn_start_camera.setEnabled(False)
-                self.btn_start_camera.setProperty("status", "unavailable")
-                self.btn_start_camera.style().unpolish(self.btn_start_camera)
-                self.btn_start_camera.style().polish(self.btn_start_camera)
-            except:
-                print("HIER Bug fixen")
+            self.camera_selector.addItem("Keine Kamera erkannt")
+            self.status.showMessage("Keine Kameras gefunden.")
+            self.btn_start_camera.setEnabled(False) # Bug: setEnable ändert Button-Style nicht automatisch"
+            self.btn_start_camera.setProperty("status", "unavailable")
+            self.btn_start_camera.style().unpolish(self.btn_start_camera)
+            self.btn_start_camera.style().polish(self.btn_start_camera)
+            
         pass
             
     def start_camera(self):
         # Startet die Kamera und den Live-Modus.
         print("Versuche, die Kamera zu starten...")
-        camera_index = 0  # Default-Kamera
+        camera_index = self.camera_selector.currentIndex()  # Kamera-Index auswählen
         try:
             self.btn_refresh_cameras.setEnabled(False)
             self.btn_start_camera.setProperty("status","stop")
@@ -237,6 +209,9 @@ class App(QMainWindow):
         if self.mode_selector.currentText() == "live":
             frame, ret = self.camera_manager.get_frame()
             if not ret:
+                self.stop_camera()
+                self.refresh_camera_list()
+                self.btn_start_camera.setChecked(False)
                 return  # If no frame, do nothing
 
         # Convert the frame from BGR to RGB
