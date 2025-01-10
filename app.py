@@ -1,8 +1,8 @@
 import cv2
 from PySide6.QtWidgets import QMainWindow, QWidget, QPushButton, QLabel, QComboBox, QStatusBar
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QSizePolicy 
-from PySide6.QtGui import QPixmap, QImage
-from PySide6.QtCore import QTimer, Qt
+from PySide6.QtGui import QPixmap, QImage , QPainter, QColor
+from PySide6.QtCore import QTimer, Qt, QRect
 import numpy as np
 from cameramanager import CameraManager
 from classifiermanager import ClassifierManager
@@ -20,7 +20,7 @@ class App(QMainWindow):
                 central_widget (QWidget): Zentrales Widget der GUI.
                 status (QStatusBar): Statusleiste der GUI.
                 image_display (QLabel): Anzeigebereich für Bilder/Kamera.
-                info_label (QLabel): Info-Label für Statusmeldungen.
+                animation_label (QLabel): Label für die Beispielanimation.
 
                 btn_refresh_cameras (QPushButton): Button zum Aktualisieren der Kameras.
                 btn_load_image (QPushButton): Button zum Laden von Bildern/Videos.
@@ -33,11 +33,12 @@ class App(QMainWindow):
                 face_count_label (QLabel): Anzeige für erkannte Gesichter.
 
                 timer (QTimer): Timer für die Aktualisierung der Frames.
+                animation_timer (QTimer): Timer für die Beispielanimation.
                 
                 current_frame (np.ndarray): Aktuelles Frame der Kamera.
                 static_image (np.ndarray): Statisches Bild/Video
 
-    Methods: __init__, load_stylesheet, refresh_camera_list, start_camera, stop_camera, start_stop_camera, load_image_from_file, update_frame
+    Methods: __init__, load_stylesheet, refresh_camera_list, start_camera, stop_camera, start_stop_camera, load_image_from_file, update_frame, animation, draw_haar_filter
     """
     def __init__(self):
         """Initialisiert die GUI und die Manager-Instanzen."""	
@@ -54,9 +55,19 @@ class App(QMainWindow):
         try:    # Versuche Stylesheet zu laden
             self.load_stylesheet("style_sheet.css")
             self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
+            self.i2 = cv2.imread("face_animation.jpg")
+            self.i1 = cv2.imread("b2-1_haarcascades/face_animation.jpg")
         except: # Fehlerbehandlung beim Laden des Stylesheets
             print("Fehler beim Laden des Stylesheets, stelle sicher das du im richtigen Verzeichnis ../b2-1_haarcascades/main.py startest")
-            
+        
+        # Sicherstellen, dass App nicht abstürzt, wenn Bild nicht geladen werden kann
+        if type(self.i1) != type(None):     
+            self.image = QImage(self.i1.data, self.i1.shape[1], self.i1.shape[0], QImage.Format.Format_RGB888)
+        elif type(self.i2) != type(None):    
+            self.image = QImage(self.i2.data, self.i2.shape[1], self.i2.shape[0], QImage.Format.Format_RGB888)
+        else: 
+            self.image = QImage(250,250)
+        
         # Central Widget
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
@@ -69,8 +80,8 @@ class App(QMainWindow):
         debug_layout.addWidget(self.status)
         
 
-        # Image/Camera Display Area
-        self.image_display = QLabel("Live/Loaded Image Display Area")
+        # Kamera- und Bildanzeigebereich
+        self.image_display = QLabel("Anzeigebereich für Bilder/Kamera")
         self.image_display.setStyleSheet("background-color: #dcdcdc; border: 1px solid black;")
         self.image_display.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.image_display.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -79,13 +90,20 @@ class App(QMainWindow):
 
         # Control Panel Layout
         control_panel = QVBoxLayout()
-        # Info Label
-        self.info_label = QLabel("Live-Kamera oder Bild/Video auswählen")
-        self.info_label.setMinimumWidth(250)
-        self.info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        control_panel.addWidget(self.info_label)
 
-        # Camera Selector Layout
+        # Info Label - Beispielanimation Haar Cascades
+        self.animation_label = QLabel()
+        self.pixmap = QPixmap(self.image)
+        self.pixmap = self.pixmap.scaled(250, 250)
+        self.x = 0
+        self.y = 0
+        self.random_int = np.random.randint(0, 5)
+        self.animation_label.setPixmap(self.pixmap)
+        self.animation_label.setMinimumWidth(250)
+        self.animation_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        control_panel.addWidget(self.animation_label)
+
+        # Kamera Dropdown Layout
         camera_layout = QHBoxLayout()
         self.camera_selector = QComboBox()
         self.camera_selector.addItem("Keine Kamera erkannt")
@@ -97,7 +115,7 @@ class App(QMainWindow):
         control_panel.addWidget(self.btn_refresh_cameras)
         control_panel.addLayout(camera_layout)
 
-        # Mode Selector
+        # Modus Auswahl Layout
         mode_layout = QHBoxLayout()
         self.mode_selector = QComboBox()
         self.mode_selector.setEnabled(False)
@@ -121,37 +139,92 @@ class App(QMainWindow):
         self.btn_start_camera.clicked.connect(self.start_stop_camera)
         buttons_layout.addWidget(self.btn_start_camera)
 
-        # Kamera Stoppen
-        #self.btn_stop_camera = QPushButton("Kamera Stoppen")
-        #self.btn_stop_camera.setEnabled(False)
-        #self.btn_stop_camera.clicked.connect(self.stop_camera)
-        #buttons_layout.addWidget(self.btn_stop_camera, 1, 0)
-
         self.btn_train_classifier = QPushButton("Klassifizierer Trainieren")
         self.btn_train_classifier.setEnabled(False)
         #self.btn_train_classifier.clicked.connect(self.classifier_manager.train_classifier)
         buttons_layout.addWidget(self.btn_train_classifier)
         control_panel.addLayout(buttons_layout)
 
-        # Face Count Label
-        self.face_count_label = QLabel("Erkannte Gesichter: 0")
+        # Erkannte Gesichter Label
+        self.face_count_label = QLabel("")
+        self.face_count_label.setText(f"<a href=\"http://www.easteregg.com\"> Erkannte Gesichter: {self.x} </a>")
+        self.face_count_label.setOpenExternalLinks(True)
         self.face_count_label.setAlignment(Qt.AlignmentFlag.AlignRight)
         control_panel.addWidget(self.face_count_label)
-
-        # Add Control Panel to Main Layout
         main_layout.addLayout(control_panel)
 
-        # Timer for Updating Frames
+        # Timer für die Aktualisierung der Frames
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
 
+        # Timer für Beispielanimation
+        self.animation_timer = QTimer(self)
+        self.animation_timer.timeout.connect(self.animation)
+        self.animation_timer.start(50)  # Animationsgeschwindigkeit in ms
 
-        # Variables
+        # Variablen
         self.current_frame = None
         self.static_image = None
 
-        # Automatically refresh camera list when the GUI starts
+        # Kameraliste bei Programmstart aktualisieren
         self.btn_refresh_cameras.click()
+
+    def animation(self):
+        """
+        Animiert die Haar Cascade Features
+        """
+        if self.x + 60 >= 250:
+            self.x = 0
+            self.y += 60
+            self.random_int = np.random.randint(0, 5)
+
+        if self.y + 60 >= 250:
+            self.x = 0
+            self.y = 0
+            
+        self.x += 10
+        self.draw_haar_filter()
+        pass
+
+    def draw_haar_filter(self):
+        """
+        Zeichnet Haar Cascade Features
+        """
+        overlay_pixmap = self.pixmap.copy()
+        painter = QPainter(overlay_pixmap)
+        x, y = self.x, self.y
+
+        if self.random_int == 0:
+            painter.fillRect(QRect(x,      y, 20, 60), QColor("white"))
+            painter.fillRect(QRect(x + 20, y, 20, 60), QColor("black"))
+            painter.fillRect(QRect(x + 40, y, 20, 60), QColor("white"))
+        elif self.random_int == 1:
+            painter.fillRect(QRect(x, y,      60, 20), QColor("white"))
+            painter.fillRect(QRect(x, y + 20, 60, 20), QColor("black"))
+            painter.fillRect(QRect(x, y + 40, 60, 20), QColor("white"))
+        elif self.random_int == 2:
+            painter.fillRect(QRect(x     , y     , 30, 30), QColor("white"))
+            painter.fillRect(QRect(x + 30, y     , 30, 30), QColor("black"))
+            painter.fillRect(QRect(x     , y + 30, 30, 30), QColor("white"))
+            painter.fillRect(QRect(x + 30, y + 30, 30, 30), QColor("black"))
+        elif self.random_int == 3:
+            painter.fillRect(QRect(x     , y     , 30, 30), QColor("white"))
+            painter.fillRect(QRect(x + 30, y     , 30, 30), QColor("white"))
+            painter.fillRect(QRect(x     , y + 30, 30, 30), QColor("black"))
+            painter.fillRect(QRect(x + 30, y + 30, 30, 30), QColor("black"))
+        elif self.random_int == 4:
+            painter.fillRect(QRect(x     , y     , 30, 30), QColor("white"))
+            painter.fillRect(QRect(x + 30, y     , 30, 30), QColor("black"))
+            painter.fillRect(QRect(x     , y + 30, 30, 30), QColor("black"))
+            painter.fillRect(QRect(x + 30, y + 30, 30, 30), QColor("white"))
+        else:
+            painter.fillRect(QRect(x     , y     , 30, 30), QColor("black"))
+            painter.fillRect(QRect(x + 30, y     , 30, 30), QColor("white"))
+            painter.fillRect(QRect(x     , y + 30, 30, 30), QColor("white"))
+            painter.fillRect(QRect(x + 30, y + 30, 30, 30), QColor("black"))
+
+        painter.end()
+        self.animation_label.setPixmap(overlay_pixmap)
 
 
     def load_stylesheet(self, filename):
@@ -208,7 +281,7 @@ class App(QMainWindow):
             self.status.showMessage(f"Kamera {camera_index} erfolgreich gestartet.")
             self.timer.start(10)  # Update every 10 ms
         except Exception as e:
-            self.info_label.setText(f"Kamera konnte nicht gestartet werden: {str(e)}")
+            self.animation_label.setText(f"Kamera konnte nicht gestartet werden: {str(e)}")
             self.status.showMessage(f"Kamera-Fehler: {str(e)}")
         pass
 
