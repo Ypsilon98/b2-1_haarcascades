@@ -47,7 +47,7 @@ class App(QMainWindow):
         # Manager Instanzen
         self.camera_manager = CameraManager()
         #self.classifier_manager = ClassifierManager()
-        #self.file_manager = FileManager()
+        self.file_manager = FileManager()
 
         self.setWindowTitle("Gesichtserkennung mit Haarcascades")   # Fenstertitel
         self.setGeometry(100, 100, 1000, 700)  # Default Fenstergröße festlegen
@@ -132,8 +132,9 @@ class App(QMainWindow):
         buttons_layout = QVBoxLayout()
         # Bild laden
         self.btn_load_image = QPushButton("Bild/Video Laden")
+        self.btn_load_image.setCheckable(True)
         self.btn_load_image.setEnabled(False)
-        #self.btn_load_image.clicked.connect(self.load_image_from_file)
+        self.btn_load_image.clicked.connect(self.load_image_from_file)
         buttons_layout.addWidget(self.btn_load_image)
 
         self.btn_start_camera = QPushButton("Live-Kamera Starten")
@@ -314,7 +315,9 @@ class App(QMainWindow):
     
     # Lädt ein Bild oder Video aus einer Datei.
     def load_image_from_file(self):
-        pass
+       
+        file_path = self.file_manager.open_file_dialog()
+        return file_path
 
     # Holt ein Frame von der Kamera und zeigt es in der GUI an. 
     def update_frame(self):
