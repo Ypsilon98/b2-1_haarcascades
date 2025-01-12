@@ -65,4 +65,4 @@ class FileManager:
 
 
 file_manager = FileManager()
-file_manager.open_file_dialog
+file_manager.open_file_dialog()
