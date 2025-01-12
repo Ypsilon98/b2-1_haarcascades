@@ -6,7 +6,7 @@ import cv2
 
 class FileManager:
     def __init__(self):
-        #Initialisiert den FileManager.
+        #Initialisiert den FileManager. Ist hier implementiert aufgrund Erweiterungen in der Zukunft.
         pass
 
     def open_file_dialog(self, title="Datei auswählen", filetypes=(
