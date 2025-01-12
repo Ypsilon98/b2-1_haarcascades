@@ -63,3 +63,6 @@ class FileManager:
             print("Speichern abgebrochen.")
             return None
 
+
+file_manager = FileManager()
+file_manager.open_file_dialog
