@@ -1,6 +1,4 @@
 import cv2
-#from tkinter import filedialog
-
 class ClassifierManager:
     def __init__(self):
         # Initialisiert den Klassifizierer-Manager.
