@@ -142,6 +142,17 @@ class App(QMainWindow):
         self.btn_start_camera.clicked.connect(self.start_stop_camera)
         buttons_layout.addWidget(self.btn_start_camera)
 
+        self.classifier_selector = QComboBox()
+        self.classifier_selector.setEnabled(True)
+        self.classifier_selector.addItems(["face", "other"])
+        buttons_layout.addWidget(self.classifier_selector)
+
+        self.btn_choose_classifier = QPushButton("Klassifizierer Auswählen")
+        self.btn_choose_classifier.setEnabled(False)
+        #self.btn_train_classifier.clicked.connect(self.classifier_manager.train_classifier)
+        buttons_layout.addWidget(self.btn_choose_classifier)
+        #control_panel.addLayout(buttons_layout)
+
         self.btn_train_classifier = QPushButton("Klassifizierer Trainieren")
         self.btn_train_classifier.setEnabled(False)
         #self.btn_train_classifier.clicked.connect(self.classifier_manager.train_classifier)
