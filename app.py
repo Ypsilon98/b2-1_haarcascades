@@ -277,7 +277,7 @@ class App(QMainWindow):
             self.camera_manager.start_camera(camera_index)
             print(f"Kamera {camera_index} erfolgreich gestartet.")
             self.status.showMessage(f"Kamera {camera_index} erfolgreich gestartet.")
-            self.timer.start(10)  # Update every 10 ms
+            self.timer.start(10)  # Update alle 10 ms
         except Exception as e:
             self.animation_label.setText(f"Kamera konnte nicht gestartet werden: {str(e)}")
             self.status.showMessage(f"Kamera-Fehler: {str(e)}")
@@ -295,7 +295,7 @@ class App(QMainWindow):
         self.camera_manager.stop_camera()
         self.timer.stop()
         self.image_display.clear()  # Clear the pixmap from the label
-        self.image_display.setText("Live/Loaded Image Display Area")  # Optionally set a default message
+        self.image_display.setText("Live/Loaded Image Display Area")  # Optionale Standardnachricht
         self.status.showMessage("Kamera gestoppt.")
         pass
 
@@ -326,7 +326,7 @@ class App(QMainWindow):
                 self.refresh_camera_list()
                 self.btn_start_camera.setChecked(False)
                 return  
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, umwandlung in RGB
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, Umwandlung in RGB
 
         height, width, channel = frame.shape # Größe des Frames
         aspect_ratio = height/width # Seitenverhältnis
