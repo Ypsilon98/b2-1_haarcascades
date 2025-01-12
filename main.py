@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QApplication 
 from app import App
-from filemanager import FileManager
+
 
 if __name__ == "__main__":
     
