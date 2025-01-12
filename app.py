@@ -121,8 +121,9 @@ class App(QMainWindow):
         # Modus Auswahl Layout
         mode_layout = QHBoxLayout()
         self.mode_selector = QComboBox()
-        self.mode_selector.setEnabled(False)
+        self.mode_selector.setEnabled(True)
         self.mode_selector.addItems(["live", "file"])
+        self.mode_selector.currentTextChanged.connect(self.change_mode)
         mode_layout.addWidget(QLabel("Modus:"))
         mode_layout.addWidget(self.mode_selector)
         #mode_layout.addWidget(QLabel(""))
@@ -132,8 +133,6 @@ class App(QMainWindow):
         buttons_layout = QVBoxLayout()
         # Bild laden
         self.btn_load_image = QPushButton("Bild/Video Laden")
-        self.btn_load_image.setCheckable(True)
-        self.btn_load_image.setEnabled(False)
         self.btn_load_image.clicked.connect(self.load_image_from_file)
         buttons_layout.addWidget(self.btn_load_image)
 
@@ -172,6 +171,7 @@ class App(QMainWindow):
 
         # Kameraliste bei Programmstart aktualisieren
         self.btn_refresh_cameras.click()
+        self.change_mode(self.mode_selector.currentText())
 
     # Animiert die Haar Cascade Features
     def animation(self):
@@ -241,6 +241,33 @@ class App(QMainWindow):
             print(f"Error: Stylesheet file '{filename}' not found.")
 
 
+
+    # Ändert den Modus basierend auf der Auswahl im Dropdown-Menü.
+    def change_mode(self, text):
+        
+        if text == "live":
+            self.btn_start_camera.setEnabled(True)
+            self.btn_start_camera.setProperty("status","start")
+            self.btn_start_camera.style().unpolish(self.btn_start_camera) 
+            self.btn_start_camera.style().polish(self.btn_start_camera)    
+            self.btn_load_image.setEnabled(False)
+            self.btn_load_image.setProperty("status","unavailable")
+            self.btn_load_image.style().unpolish(self.btn_load_image)
+            self.btn_load_image.style().polish(self.btn_load_image)
+        elif text == "file":
+            self.btn_start_camera.setEnabled(False)
+            self.btn_start_camera.setProperty("status", "unavailable")
+            self.btn_start_camera.style().unpolish(self.btn_start_camera)
+            self.btn_start_camera.style().polish(self.btn_start_camera)
+            self.btn_load_image.setEnabled(True)
+            self.btn_load_image.setProperty("status","start")
+            self.btn_load_image.style().unpolish(self.btn_load_image)
+            self.btn_load_image.style().polish(self.btn_load_image)
+        else:
+            self.btn_start_camera.setEnabled(False)
+            self.btn_load_image.setEnabled(False)
+        pass
+
     # Aktualisiert die Liste der verfügbaren Kameras.
     def refresh_camera_list(self):
         
@@ -271,6 +298,8 @@ class App(QMainWindow):
         camera_index = self.camera_selector.currentIndex()  # Kamera-Index auswählen
         try:
             self.btn_refresh_cameras.setEnabled(False)
+            self.camera_selector.setEnabled(False)
+            self.mode_selector.setEnabled(False)
             self.btn_start_camera.setProperty("status","stop")
             self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
             self.btn_start_camera.style().polish(self.btn_start_camera)    # Reapply style
@@ -292,6 +321,8 @@ class App(QMainWindow):
         self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
         self.btn_start_camera.style().polish(self.btn_start_camera)    # Reapply style
         self.btn_start_camera.setText("Live-Kamera Starten")
+        self.camera_selector.setEnabled(True)
+        self.mode_selector.setEnabled(True)
         self.status.showMessage("Kamera wird gestoppt...")
         self.camera_manager.stop_camera()
         self.timer.stop()
@@ -323,8 +354,8 @@ class App(QMainWindow):
                 self.mode_selector.setCurrentText("file")
                 self.btn_start_camera.setChecked(False)
                 self.btn_start_camera.setEnabled(False)
-                self.btn_load_image.setChecked(True)
-                self.btn_load_image.setEnabled(True)
+                #self.btn_load_image.setChecked(True)
+                #self.btn_load_image.setEnabled(True)
                 self.timer.start(10)
 
     # Holt ein Frame von der Kamera und zeigt es in der GUI an. 
