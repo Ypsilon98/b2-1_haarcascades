@@ -41,7 +41,7 @@ class App(QMainWindow):
     Methods: __init__, load_stylesheet, refresh_camera_list, start_camera, stop_camera, start_stop_camera, load_image_from_file, update_frame, animation, draw_haar_filter
     """
     def __init__(self):
-        """Initialisiert die GUI und die Manager-Instanzen."""	
+        # Initialisiert die GUI und die Manager-Instanzen.
         super().__init__()
         
         # Manager Instanzen
@@ -52,12 +52,15 @@ class App(QMainWindow):
         self.setWindowTitle("Gesichtserkennung mit Haarcascades")   # Fenstertitel
         self.setGeometry(100, 100, 1000, 700)  # Default Fenstergröße festlegen
 
-        try:    # Versuche Stylesheet zu laden
+        # Versuche Stylesheet zu laden
+        try:    
             self.load_stylesheet("style_sheet.css")
             self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
             self.i2 = cv2.imread("face_animation.jpg")
             self.i1 = cv2.imread("b2-1_haarcascades/face_animation.jpg")
-        except: # Fehlerbehandlung beim Laden des Stylesheets
+
+        # Fehlerbehandlung beim Laden des Stylesheets
+        except: 
             print("Fehler beim Laden des Stylesheets, stelle sicher das du im richtigen Verzeichnis ../b2-1_haarcascades/main.py startest")
         
         # Sicherstellen, dass App nicht abstürzt, wenn Bild nicht geladen werden kann
@@ -169,10 +172,9 @@ class App(QMainWindow):
         # Kameraliste bei Programmstart aktualisieren
         self.btn_refresh_cameras.click()
 
+    # Animiert die Haar Cascade Features
     def animation(self):
-        """
-        Animiert die Haar Cascade Features
-        """
+        
         if self.x + 60 >= 250:
             self.x = 0
             self.y += 60
@@ -186,10 +188,9 @@ class App(QMainWindow):
         self.draw_haar_filter()
         pass
 
+    # Zeichnet Haar Cascade Features
     def draw_haar_filter(self):
-        """
-        Zeichnet Haar Cascade Features
-        """
+
         overlay_pixmap = self.pixmap.copy()
         painter = QPainter(overlay_pixmap)
         x, y = self.x, self.y
@@ -227,12 +228,11 @@ class App(QMainWindow):
         self.animation_label.setPixmap(overlay_pixmap)
 
 
+    
+    # Lädt ein Stylesheet aus einer Datei.
+    # Parameters: filename (str): Dateiname des Stylesheets.
     def load_stylesheet(self, filename):
-        """
-        Lädt ein Stylesheet aus einer Datei.
 
-        Parameters: filename (str): Dateiname des Stylesheets.
-        """
         try:
             with open(filename, "r") as file:
                 self.setStyleSheet(file.read())
@@ -240,10 +240,9 @@ class App(QMainWindow):
             print(f"Error: Stylesheet file '{filename}' not found.")
 
 
+    # Aktualisiert die Liste der verfügbaren Kameras.
     def refresh_camera_list(self):
-        """
-        Aktualisiert die Liste der verfügbaren Kameras.
-        """
+        
         available_cameras = self.camera_manager.detect_cameras()
         self.camera_selector.clear()
         if available_cameras:
@@ -263,11 +262,10 @@ class App(QMainWindow):
             self.btn_start_camera.style().polish(self.btn_start_camera)
             
         pass
-            
+
+    # Startet die Kamera.   
     def start_camera(self):
-        """
-        Startet die Kamera.
-        """
+        
         print("Versuche, die Kamera zu starten...")
         camera_index = self.camera_selector.currentIndex()  # Kamera-Index auswählen
         try:
@@ -284,11 +282,10 @@ class App(QMainWindow):
             self.animation_label.setText(f"Kamera konnte nicht gestartet werden: {str(e)}")
             self.status.showMessage(f"Kamera-Fehler: {str(e)}")
         pass
-
+    
+    # Stoppt die Kamera.
     def stop_camera(self):
-        """
-        Stoppt die Kamera.
-        """
+
         self.btn_refresh_cameras.setEnabled(True)
         self.btn_start_camera.setProperty("status","start")
         self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
@@ -302,11 +299,11 @@ class App(QMainWindow):
         self.status.showMessage("Kamera gestoppt.")
         pass
 
+    # Startet oder stoppt die Kamera, je nach Status des Buttons.
     def start_stop_camera(self,checked):
-        """
-        Startet oder stoppt die Kamera, je nach Status des Buttons.
-        """
-        if checked:                 #self.btn_start_camera.isChecked():
+
+        #self.btn_start_camera.isChecked():
+        if checked:                 
             self.start_camera()
             print("Kamera gestartet")
         else:
@@ -314,15 +311,14 @@ class App(QMainWindow):
             print("Kamera gestartet")
         pass
 
-
+    
+    # Lädt ein Bild oder Video aus einer Datei.
     def load_image_from_file(self):
-        """
-        Lädt ein Bild oder Video aus einer Datei.
-        """
         pass
 
+    # Holt ein Frame von der Kamera und zeigt es in der GUI an. 
     def update_frame(self):
-        """ Holt ein Frame von der Kamera und zeigt es in der GUI an. """
+        
         if self.mode_selector.currentText() == "live":
             frame, ret = self.camera_manager.get_frame()
             if not ret: # Wenn Kamera keine Frames mehr liefert/disconnected, stoppe Kamera und aktualisiere Kamera-Liste
