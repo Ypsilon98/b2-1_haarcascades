@@ -46,7 +46,7 @@ class App(QMainWindow):
         
         # Manager Instanzen
         self.camera_manager = CameraManager()
-        #self.classifier_manager = ClassifierManager()
+        self.classifier_manager = ClassifierManager()
         self.file_manager = FileManager()
 
         self.setWindowTitle("Gesichtserkennung mit Haarcascades")   # Fenstertitel
@@ -317,7 +317,15 @@ class App(QMainWindow):
     def load_image_from_file(self):
        
         file_path = self.file_manager.open_file_dialog()
-        return file_path
+        if file_path:
+            self.static_image = self.file_manager.load_image(file_path)
+            if self.static_image is not None:
+                self.mode_selector.setCurrentText("file")
+                self.btn_start_camera.setChecked(False)
+                self.btn_start_camera.setEnabled(False)
+                self.btn_load_image.setChecked(True)
+                self.btn_load_image.setEnabled(True)
+                self.timer.start(10)
 
     # Holt ein Frame von der Kamera und zeigt es in der GUI an. 
     def update_frame(self):
@@ -330,6 +338,14 @@ class App(QMainWindow):
                 self.btn_start_camera.setChecked(False)
                 return  
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, Umwandlung in RGB
+
+        # Gesichtserkennung
+        faces = self.classifier_manager.detect_faces(frame)
+        num_faces = len(faces)
+
+        # Zeichne grüne Rechtecke um erkannte Gesichter
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
         height, width, channel = frame.shape # Größe des Frames
         aspect_ratio = height/width # Seitenverhältnis
