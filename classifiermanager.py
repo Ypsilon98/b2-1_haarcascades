@@ -16,6 +16,10 @@ class ClassifierManager:
         file_path = self.file_manager.open_file_dialog(title="Wähle Haar-Cascade XML-Datei", filetypes=(("XML-Dateien", "*.xml"), ("Alle Dateien", "*.*")))
         if file_path:
             self.face_cascade = cv2.CascadeClassifier(file_path)
+        else:
+            self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+
+        return file_path.split("/")[-1] if file_path else "Keine Datei ausgewählt!"
 
 #Test
 
