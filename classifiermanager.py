@@ -17,6 +17,7 @@ class ClassifierManager:
         if file_path:
             self.face_cascade = cv2.CascadeClassifier(file_path)
 
+#Test
 
 
     # Trainiert einen benutzerdefinierten Haar-Cascade Klassifizierer.
