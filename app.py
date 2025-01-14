@@ -30,7 +30,7 @@ class App(QMainWindow):
                 camera_selector (QComboBox): Dropdown-Liste für Kameras.
                 mode_selector (QComboBox): Dropdown-Liste für Modusauswahl.
                 
-                face_count_label (QLabel): Anzeige für erkannte Gesichter.
+                object_count_label (QLabel): Anzeige für erkannte Gesichter.
 
                 timer (QTimer): Timer für die Aktualisierung der Frames.
                 animation_timer (QTimer): Timer für die Beispielanimation.
@@ -49,7 +49,7 @@ class App(QMainWindow):
         self.classifier_manager = ClassifierManager()
         self.file_manager = FileManager()
 
-        self.setWindowTitle("Gesichtserkennung mit Haarcascades")   # Fenstertitel
+        self.setWindowTitle("Objekterkennung mit Haarcascades")   # Fenstertitel
         self.setGeometry(100, 100, 1000, 700)  # Default Fenstergröße festlegen
 
         # Versuche Stylesheet zu laden
@@ -162,14 +162,20 @@ class App(QMainWindow):
         self.btn_train_classifier.setEnabled(False)
         #self.btn_train_classifier.clicked.connect(self.classifier_manager.train_classifier)
         buttons_layout.addWidget(self.btn_train_classifier)
+
+        self.btn_screenshot = QPushButton("Screenshot")
+        self.btn_screenshot.setEnabled(False)
+        buttons_layout.addWidget(self.btn_screenshot)
         control_panel.addLayout(buttons_layout)
 
         # Erkannte Gesichter Label
-        self.face_count_label = QLabel("")
-        self.face_count_label.setText(f"<a href=\"http://www.easteregg.com\"> Erkannte Gesichter: {self.x} </a>")
-        self.face_count_label.setOpenExternalLinks(True)
-        self.face_count_label.setAlignment(Qt.AlignmentFlag.AlignRight)
-        control_panel.addWidget(self.face_count_label)
+        self.num_faces = 0 # Anzahl der erkannten Gesichter
+        self.object_count_label = QLabel("")
+        self.object_count_label.setText(f"<a href=\"http://www.easteregg.com\"> Erkannte Objekte: {self.num_faces} </a>")
+        self.object_count_label.setOpenExternalLinks(True)
+        self.object_count_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.object_count_label.setStyleSheet("font-size: 18px; color: blue;")
+        control_panel.addWidget(self.object_count_label)
         main_layout.addLayout(control_panel)
 
         # Timer für die Aktualisierung der Frames
@@ -386,13 +392,15 @@ class App(QMainWindow):
                 return  
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, Umwandlung in RGB
 
-        # Gesichtserkennung
-        faces = self.classifier_manager.detect_faces(frame)
-        num_faces = len(faces)
-
+        
+        # Objekterkennung
+        objects = self.classifier_manager.detect_faces(frame)
+        self.num_objects = len(objects) # Anzahl der erkannten Objekte
+        self.object_count_label.setText(f"<a href=\"http://www.easteregg.com\"> Erkannte Objekte: {self.num_objects} </a>")
+        
         # Zeichne grüne Rechtecke um erkannte Gesichter
-        for (x, y, w, h) in faces:
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        for (x, y, w, h) in objects:
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
 
         height, width, channel = frame.shape # Größe des Frames
         aspect_ratio = height/width # Seitenverhältnis
