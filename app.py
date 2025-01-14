@@ -31,7 +31,7 @@ class App(QMainWindow):
                 btn_train_classifier (QPushButton): Button zum Trainieren von Klassifizierern.
                 btn_screenshot (QPushButton): Button zum Erstellen von Screenshots.
 
-                num_faces (int): Anzahl der erkannten Gesichter.
+                num_objects (int): Anzahl der erkannten Gesichter.
                 object_count_label (QLabel): Label für die Anzahl der erkannten Objekte.
 
                 timer (QTimer): Timer für die Aktualisierung der Frames.
@@ -173,9 +173,9 @@ class App(QMainWindow):
 
         # Erkannte Objekte Label
         objects_layout = QHBoxLayout()
-        self.num_faces = 0 # Anzahl der erkannten Gesichter
+        self.num_objects = 0 # Anzahl der erkannten Objekte
         self.object_count_label = QLabel("")
-        self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_faces} </a>")
+        self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
         self.object_count_label.setOpenExternalLinks(True)
         self.object_count_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.object_count_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
@@ -404,7 +404,7 @@ class App(QMainWindow):
         # Objekterkennung
         objects = self.classifier_manager.detect_faces(frame)
         self.num_objects = len(objects) # Anzahl der erkannten Objekte
-        self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_faces} </a>")
+        self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
         
         # Zeichne grüne Rechtecke um erkannte Gesichter
         for (x, y, w, h) in objects:
