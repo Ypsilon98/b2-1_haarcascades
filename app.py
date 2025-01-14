@@ -55,7 +55,7 @@ class App(QMainWindow):
         # Versuche Stylesheet zu laden
         try:    
             self.load_stylesheet("style_sheet.css")
-            self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
+            #self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
             self.i2 = cv2.imread("face_animation.jpg")
             self.i1 = cv2.imread("b2-1_haarcascades/face_animation.jpg")
 
@@ -350,13 +350,7 @@ class App(QMainWindow):
         file_path = self.file_manager.open_file_dialog()
         if file_path:
             self.static_image = self.file_manager.load_image(file_path)
-            if self.static_image is not None:
-                self.mode_selector.setCurrentText("file")
-                self.btn_start_camera.setChecked(False)
-                self.btn_start_camera.setEnabled(False)
-                #self.btn_load_image.setChecked(True)
-                #self.btn_load_image.setEnabled(True)
-                self.timer.start(10)
+            
 
     # Holt ein Frame von der Kamera und zeigt es in der GUI an. 
     def update_frame(self):
