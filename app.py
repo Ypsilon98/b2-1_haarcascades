@@ -1,7 +1,7 @@
 import cv2
-from PySide6.QtWidgets import QMainWindow, QWidget, QPushButton, QLabel, QComboBox, QStatusBar
+from PySide6.QtWidgets import QMainWindow, QWidget, QPushButton, QLabel, QComboBox, QStatusBar, QMessageBox
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QSizePolicy 
-from PySide6.QtGui import QPixmap, QImage , QPainter, QColor
+from PySide6.QtGui import QPixmap, QImage , QPainter, QColor, QAction
 from PySide6.QtCore import QTimer, Qt, QRect
 import numpy as np
 from cameramanager import CameraManager
@@ -78,6 +78,33 @@ class App(QMainWindow):
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
+        # Create the menu bar
+        menu_bar = self.menuBar()
+        view_menu = menu_bar.addMenu("Ansicht")
+        self.fullscreen_action = QAction("Vollbild",self)
+        self.fullscreen_action.triggered.connect(self.toggle_fullscreen)
+        view_menu.addAction(self.fullscreen_action)
+
+        self.is_nightmode = False # Nachtmodus deaktiviert
+        self.nightmode_action = QAction("Nachtmodus",self)
+        self.nightmode_action.triggered.connect(self.toggle_nightmode)
+        view_menu.addAction(self.nightmode_action)
+
+
+        help_menu = menu_bar.addMenu("Info")
+        help_action = QAction("Kurzanleitung",self)
+        help_action.triggered.connect(self.show_help)
+        help_menu.addAction(help_action)
+
+        about_action = QAction("Über", self)
+        about_action.triggered.connect(self.show_about)
+        help_menu.addAction(about_action)
+        end_action = QAction("Beenden", self)
+        end_action.triggered.connect(self.close)
+        help_menu.addAction(end_action)
+
+        
+
         # Main Layout
         debug_layout = QVBoxLayout(self.central_widget)
         main_layout = QHBoxLayout()
@@ -88,7 +115,8 @@ class App(QMainWindow):
 
         # Kamera- und Bildanzeigebereich
         self.image_display = QLabel("Anzeigebereich für Bilder/Kamera")
-        self.image_display.setStyleSheet("background-color: #dcdcdc; border: 1px solid black;")
+        #self.image_display.setStyleSheet("background-color: #dcdcdc; border: 1px solid black;")
+        self.image_display.setProperty("status", "display")
         self.image_display.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.image_display.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.image_display.setMinimumSize(300,300)
@@ -257,6 +285,44 @@ class App(QMainWindow):
 
         painter.end()
         self.animation_label.setPixmap(overlay_pixmap)
+
+    # Schaltet zwischen Vollbildmodus und Fenstermodus um.
+    def toggle_fullscreen(self):
+        if self.isFullScreen():
+            self.showNormal()
+            self.fullscreen_action.setText("Vollbild")
+        else:
+            self.showFullScreen()
+            self.fullscreen_action.setText("Fenstermodus")
+    
+        # Schaltet zwischen Nachtmodus und Tagmodus (stylesheets) um.
+    def toggle_nightmode(self):
+        # Versuche Stylesheet zu laden
+        if self.is_nightmode:
+            try:    
+                self.load_stylesheet("style_sheet.css")
+                self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
+            # Fehlerbehandlung beim Laden des Stylesheets
+            except: 
+                print("Fehler beim Laden des Stylesheets, stelle sicher das du im richtigen Verzeichnis ../b2-1_haarcascades/main.py startest")
+            self.nightmode_action.setText("Nachtmodus")
+        else:
+            try:    
+                self.load_stylesheet("night_mode.css")
+                self.load_stylesheet("b2-1_haarcascades/night_mode.css")
+            # Fehlerbehandlung beim Laden des Stylesheets
+            except: 
+                print("Fehler beim Laden des Stylesheets, stelle sicher das du im richtigen Verzeichnis ../b2-1_haarcascades/main.py startest")
+            self.nightmode_action.setText("Tagmodus")
+        # Update the night mode state
+        self.is_nightmode = not self.is_nightmode   
+        pass
+    
+    def show_help(self):
+        QMessageBox.about(self, "Kurzanleitung",  "Kamera und Modus auswählen und auf Live-Kamera Starten klicken.\n\nAlternativ Modus auf 'file' setzen und Bild/Video Laden.\n\nObjekte werden automatisch erkannt, markiert und gezählt.\n\nVortrainierte als auch eigene Klassifizierer können geladen werden.\n\nDazu einfach den entsprechenden Button klicken und die XML-Datei auswählen.\n\nViel Spaß!")
+
+    def show_about(self):
+        QMessageBox.about(self, "Über", "Anwendung zur Objekterkennung mit Haarcascades\n\nProgrammiert von der Projektgruppe B2-1 im Master AKI an der FH SWF Iserlohn\n\nYannick\nEmilie\nLeon\nPhilipp\n\nJanuar 2025")
 
 
     
