@@ -13,32 +13,35 @@ class App(QMainWindow):
     """
     Hauptklasse für die GUI-Anwendung.
 
-    Attributes: camera_manager (CameraManager): Instanz des CameraManager.
+    Attribute:  camera_manager (CameraManager): Instanz des CameraManager.
                 classifier_manager (ClassifierManager): Instanz des ClassifierManager.
                 file_manager (FileManager): Instanz des FileManager.
-
-                central_widget (QWidget): Zentrales Widget der GUI.
-                status (QStatusBar): Statusleiste der GUI.
+                
+                central_widget (QWidget): Zentrales Widget der Anwendung.
                 image_display (QLabel): Anzeigebereich für Bilder/Kamera.
                 animation_label (QLabel): Label für die Beispielanimation.
-
+                camera_selector (QComboBox): Dropdown-Menü für Kameraauswahl.
+                mode_selector (QComboBox): Dropdown-Menü für Modusauswahl.
+                
                 btn_refresh_cameras (QPushButton): Button zum Aktualisieren der Kameras.
                 btn_load_image (QPushButton): Button zum Laden von Bildern/Videos.
                 btn_start_camera (QPushButton): Button zum Starten/Stoppen der Kamera.
-                btn_stop_camera (QPushButton): Button zum Stoppen der Kamera.
-                btn_train_classifier (QPushButton): Button zum Trainieren des Klassifizierers.
-                camera_selector (QComboBox): Dropdown-Liste für Kameras.
-                mode_selector (QComboBox): Dropdown-Liste für Modusauswahl.
-                
-                object_count_label (QLabel): Anzeige für erkannte Gesichter.
+                classifier_selector (QComboBox): Dropdown-Menü für Klassifizierer.
+                btn_choose_classifier (QPushButton): Button zum Laden von Klassifizierern.
+                btn_train_classifier (QPushButton): Button zum Trainieren von Klassifizierern.
+                btn_screenshot (QPushButton): Button zum Erstellen von Screenshots.
+
+                num_faces (int): Anzahl der erkannten Gesichter.
+                object_count_label (QLabel): Label für die Anzahl der erkannten Objekte.
 
                 timer (QTimer): Timer für die Aktualisierung der Frames.
                 animation_timer (QTimer): Timer für die Beispielanimation.
-                
-                current_frame (np.ndarray): Aktuelles Frame der Kamera.
-                static_image (np.ndarray): Statisches Bild/Video
 
-    Methods: __init__, load_stylesheet, refresh_camera_list, start_camera, stop_camera, start_stop_camera, load_image_from_file, update_frame, animation, draw_haar_filter
+                current_frame (np.ndarray): Aktuelles Frame von der Kamera.
+                static_image (np.ndarray): Statisches Bild/Video aus Datei.
+
+     Methoden:  __init__, animation, draw_haar_filter, load_stylesheet, change_mode, refresh_camera_list,
+                start_camera, stop_camera, start_stop_camera, load_image_from_file, update_frame
     """
     def __init__(self):
         # Initialisiert die GUI und die Manager-Instanzen.
@@ -168,14 +171,19 @@ class App(QMainWindow):
         buttons_layout.addWidget(self.btn_screenshot)
         control_panel.addLayout(buttons_layout)
 
-        # Erkannte Gesichter Label
+        # Erkannte Objekte Label
+        objects_layout = QHBoxLayout()
         self.num_faces = 0 # Anzahl der erkannten Gesichter
         self.object_count_label = QLabel("")
-        self.object_count_label.setText(f"<a href=\"http://www.easteregg.com\"> Erkannte Objekte: {self.num_faces} </a>")
+        self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_faces} </a>")
         self.object_count_label.setOpenExternalLinks(True)
-        self.object_count_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.object_count_label.setStyleSheet("font-size: 18px; color: blue;")
-        control_panel.addWidget(self.object_count_label)
+        self.object_count_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.object_count_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        self.object_count_label.setStyleSheet("font-weight: bold;")
+        objects_layout.addWidget(QLabel("Erkannte Objekte: "))
+        objects_layout.addWidget(self.object_count_label)
+        control_panel.addLayout(objects_layout)
+
         main_layout.addLayout(control_panel)
 
         # Timer für die Aktualisierung der Frames
@@ -349,7 +357,7 @@ class App(QMainWindow):
         self.camera_manager.stop_camera()
         self.timer.stop()
         self.image_display.clear()  # Clear the pixmap from the label
-        self.image_display.setText("Live/Loaded Image Display Area")  # Optionale Standardnachricht
+        self.image_display.setText("Anzeigebereich für Bilder/Kamera")  # Optionale Standardnachricht
         self.status.showMessage("Kamera gestoppt.")
         pass
 
@@ -396,7 +404,7 @@ class App(QMainWindow):
         # Objekterkennung
         objects = self.classifier_manager.detect_faces(frame)
         self.num_objects = len(objects) # Anzahl der erkannten Objekte
-        self.object_count_label.setText(f"<a href=\"http://www.easteregg.com\"> Erkannte Objekte: {self.num_objects} </a>")
+        self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_faces} </a>")
         
         # Zeichne grüne Rechtecke um erkannte Gesichter
         for (x, y, w, h) in objects:
