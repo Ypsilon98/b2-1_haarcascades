@@ -12,7 +12,7 @@ class FileManager:
     # Öffnet ein Dialogfeld, um eine Datei auszuwählen.
     # Gibt zurück den Pfad zur ausgewählten Datei oder None, falls abgebrochen.
     # Standardmäßig werden nur Bilddateien angezeigt.
-    def open_file_picture(self, title="Datei auswählen", filetypes = ft_pictures):
+    def open_file_picture(self, title="Datei auswählen", filetypes = None):
         
         file_path = filedialog.askopenfilename(title=title, filetypes=filetypes)
         if file_path:
