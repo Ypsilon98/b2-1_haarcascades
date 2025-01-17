@@ -172,11 +172,8 @@ class App(QMainWindow):
         self.btn_start_camera.setEnabled(False)
         self.btn_start_camera.clicked.connect(self.start_stop_camera)
         buttons_layout.addWidget(self.btn_start_camera)
-
-        classifier_layout = QHBoxLayout()
-        self.classifier_selector = QComboBox()
-        self.classifier_selector.setEnabled(True)
         
+        """
         try:
             if os.path.exists("classifier"):
                 classifier_xml = [c for c in os.listdir("classifier") if c.endswith(".xml")]
@@ -188,13 +185,20 @@ class App(QMainWindow):
                     self.classifier_selector.addItem(xml)
         except:
             print("Fehler beim Laden der Klassifizierer.")
+        """
 
+        classifier_layout = QHBoxLayout()
+        self.classifier_selector = QComboBox()
+        self.classifier_selector.setEnabled(True)
+        self.classifier_selector.addItems(["face", "eye", "smile", "upperbody", "fullbody", "profileface", "Eigener Klassifizierer"])
+        self.classifier_selector.setCurrentText("face")
+        self.classifier_selector.currentTextChanged.connect(self.change_classifier)
         classifier_layout.addWidget(QLabel("Klassifizierer:"))
         classifier_layout.addWidget(self.classifier_selector)
         buttons_layout.addLayout(classifier_layout)
 
-        self.btn_choose_classifier = QPushButton("Eigenen Klassifizierer Laden")
-        self.btn_choose_classifier.setEnabled(True)
+        self.btn_choose_classifier = QPushButton("Eigener Klassifizierer Laden")
+        self.btn_choose_classifier.setEnabled(False)
         self.btn_choose_classifier.clicked.connect(self.classifier_manager.load_custom_classifier)
         buttons_layout.addWidget(self.btn_choose_classifier)
         #control_panel.addLayout(buttons_layout)
@@ -370,6 +374,26 @@ class App(QMainWindow):
             self.btn_start_camera.setEnabled(False)
             self.btn_load_image.setEnabled(False)
         pass
+    
+    def change_classifier(self, text):
+        self.btn_choose_classifier.setEnabled(False)
+        if text == "face":
+            self.classifier_manager.load_classifier("face")
+        elif text == "eye":
+            self.classifier_manager.load_classifier("eye")
+        elif text == "smile":
+            self.classifier_manager.load_classifier("smile")
+        elif text == "upperbody":
+            self.classifier_manager.load_classifier("upperbody")
+        elif text == "fullbody":
+            self.classifier_manager.load_classifier("fullbody")
+        elif text == "profileface":
+            self.classifier_manager.load_classifier("profileface")
+        elif text == "Eigener Klassifizierer":
+            self.btn_choose_classifier.setEnabled(True)
+        else:
+            self.classifier_manager.load_classifier("face")
+        pass
 
     # Aktualisiert die Liste der verfügbaren Kameras.
     def refresh_camera_list(self):
@@ -402,6 +426,7 @@ class App(QMainWindow):
             self.btn_refresh_cameras.setEnabled(False)
             self.camera_selector.setEnabled(False)
             self.mode_selector.setEnabled(False)
+            self.classifier_selector.setEnabled(False)
             self.btn_start_camera.setProperty("status","stop")
             self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
             self.btn_start_camera.style().polish(self.btn_start_camera)    # Reapply style
@@ -424,10 +449,14 @@ class App(QMainWindow):
         self.btn_start_camera.style().polish(self.btn_start_camera)    # Reapply style
         self.btn_start_camera.setText("Live-Kamera Starten")
         self.camera_selector.setEnabled(True)
+        self.classifier_selector.setEnabled(True)
         self.mode_selector.setEnabled(True)
         self.status.showMessage("Kamera wird gestoppt...")
         self.camera_manager.stop_camera()
         self.timer.stop()
+        self.num_objects = 0 # Anzahl der erkannten Objekte auf 0 zurücksetzen
+        self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
+
         self.image_display.clear()  # Clear the pixmap from the label
         self.image_display.setText("Anzeigebereich für Bilder/Kamera")  # Optionale Standardnachricht
         self.status.showMessage("Kamera gestoppt.")

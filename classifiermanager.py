@@ -41,15 +41,18 @@ class ClassifierManager:
     def load_classifier(self, classifier_id):
         
         if classifier_id not in self.classifiers:
+            print(f"Ungültige ID: '{classifier_id}'")
             return "Ungültige ID!"
 
         # Den Dateipfad für den gewünschten Klassifizierer erstellen
         classifier_path = cv2.data.haarcascades + self.classifiers[classifier_id]
+        print(f"Lade Klassifizierer '{self.classifiers[classifier_id]}'...")
 
         # Versuchen, den Klassifizierer zu laden
         self.face_cascade = cv2.CascadeClassifier(classifier_path)
         if self.face_cascade.empty():
             self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+            print(f"Laden des Klassifizierers '{self.classifiers[classifier_id]}' fehlgeschlagen")
             return "Laden fehlgeschlagen! Standard wird zurückgesetzt"
 
         print(f"Klassifizierer '{self.classifiers[classifier_id]}' erfolgreich geladen.")
@@ -60,7 +63,6 @@ class ClassifierManager:
 
     # Trainiert einen benutzerdefinierten Haar-Cascade Klassifizierer.
     def train_classifier(self):
-        
         pass
 
 
