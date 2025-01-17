@@ -6,12 +6,13 @@ class FileManager:
 
     #　Initialisiert den FileManager. Ist hier implementiert aufgrund Erweiterungen in der Zukunft.
     def __init__(self):
-
-        pass
-
-    #　Öffnet ein Dialogfeld, um eine Datei auszuwählen.
-    #　Gibt zurück den Pfad zur ausgewählten Datei oder None, falls abgebrochen.
-    def open_file_dialog(self, title="Datei auswählen", filetypes=(("Bilder", "*.jpg *.png *.jpeg"), ("Alle Dateien", "*.*"))):
+        self.ft_pictures = ("Bilder", "*.jpg *.png *.jpeg"), ("Alle Dateien", "*.*")
+        self.ft_classifier = ("XML-Dateien", "*.xml"), ("Alle Dateien", "*.*")
+  
+    # Öffnet ein Dialogfeld, um eine Datei auszuwählen.
+    # Gibt zurück den Pfad zur ausgewählten Datei oder None, falls abgebrochen.
+    # Standardmäßig werden nur Bilddateien angezeigt.
+    def open_file_picture(self, title="Datei auswählen", filetypes = ft_pictures):
         
         file_path = filedialog.askopenfilename(title=title, filetypes=filetypes)
         if file_path:
@@ -20,7 +21,11 @@ class FileManager:
         else:
             print("Keine Datei ausgewählt.")
             return None
+        
 
+    
+    
+    
     #　Lädt ein Bild von einem angegebenen Dateipfad.
     #　Das geladene Bild als NumPy-Array oder None, falls fehlgeschlagen.
     def load_image(self, file_path):
@@ -35,28 +40,3 @@ class FileManager:
         else:
             print(f"Bild erfolgreich geladen: {file_path}")
         return image
-
-    
-    """
-    Öffnet ein Dialogfeld, um eine Datei zu speichern.
-    Parameters:
-        title (str): Der Titel des Dialogfelds.
-        defaultextension (str): Die Standard-Dateierweiterung.
-        filetypes (tuple): Die zulässigen Dateitypen.
-
-        str: Gibt zurück den Pfad zur gespeicherten Datei oder None, falls abgebrochen.
-    """
-
-    """
-    def save_file_dialog(self, title="Speichere Datei", defaultextension=".jpg", filetypes=(("JPEG-Bild", "*.jpg"), ("PNG-Bild", "*.png"), ("Alle Dateien", "*.*"))):
-               
-        file_path = filedialog.asksaveasfilename(
-            title=title, defaultextension=defaultextension, filetypes=filetypes
-        )
-        if file_path:
-            print(f"Datei wird gespeichert unter: {file_path}")
-            return file_path
-        else:
-            print("Speichern abgebrochen.")
-            return None
-    """

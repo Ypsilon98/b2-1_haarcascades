@@ -21,21 +21,11 @@ class ClassifierManager:
 
         return file_path.split("/")[-1] if file_path else "Keine Datei ausgewählt!"
 
-#Test
-
 
     # Trainiert einen benutzerdefinierten Haar-Cascade Klassifizierer.
     def train_classifier(self):
         
-        # Beispiel-Logik für das Training eines Klassifizierers:
-        # Du kannst hier den Prozess implementieren, um z. B. Positiv- und Negativbilder zu verarbeiten.
-        file_path = filedialog.askdirectory(title="Wähle Trainingsdatensatz-Ordner")
-        if file_path:
-            # Füge hier Code für das Training mit OpenCV hinzu (z. B. mit cv2.trainCascadeClassifier).
-            print(f"Klassifizierer mit Daten aus {file_path} trainieren...")
-        else:
-            print("Kein Ordner ausgewählt!")
-
+        pass
 
 
     # Erkennt Gesichter in einem gegebenen Frame.
