@@ -2,17 +2,52 @@ import os
 from tkinter import filedialog
 import cv2
 
+
+# FileManager-Klasse zum Verwalten von Dateioperationen.
+# Unterstützt die Auswahl von Bild- und XML-Dateien.
+
 class FileManager:
 
-    #　Initialisiert den FileManager. Ist hier implementiert aufgrund Erweiterungen in der Zukunft.
+    
+
+    # Initialisiert die Dateitypen-Filter für Bilder und Klassifizierungsdateien.
     def __init__(self):
-        self.ft_pictures = ("Bilder", "*.jpg *.png *.jpeg"), ("Alle Dateien", "*.*")
-        self.ft_classifier = ("XML-Dateien", "*.xml"), ("Alle Dateien", "*.*")
-  
-    # Öffnet ein Dialogfeld, um eine Datei auszuwählen.
-    # Gibt zurück den Pfad zur ausgewählten Datei oder None, falls abgebrochen.
-    # Standardmäßig werden nur Bilddateien angezeigt.
-    def open_file_dialog(self, title="Datei auswählen", filetypes = (("Bilder", "*.jpg *.png *.jpeg"), ("Alle Dateien", "*.*"))):
+                
+        self.filetypes_pictures = [("Bilder", "*.jpg *.png *.jpeg"), ("Alle Dateien", "*.*")]
+        self.filetypes_classifier = [("XML-Dateien", "*.xml"), ("Alle Dateien", "*.*")]
+
+
+
+    """
+    Öffnet ein Dialogfeld zur Auswahl einer Bilddatei.
+
+    :param title: Titel des Dialogfelds (Standard: "Bild auswählen").
+    :return: Pfad zur ausgewählten Datei oder None, falls abgebrochen.
+    """
+    def open_file_picture(self, title="Bild auswählen"):
+        
+        return self._open_file(title, self.filetypes_pictures)
+
+    
+    """
+    Öffnet ein Dialogfeld zur Auswahl einer Klassifizierungsdatei (XML).
+
+    :param title: Titel des Dialogfelds (Standard: "Klassifizierungsdatei auswählen").
+    :return: Pfad zur ausgewählten Datei oder None, falls abgebrochen.
+    """
+    def open_file_classifier(self, title="Klassifizierungsdatei auswählen"):
+        
+        return self._open_file(title, self.filetypes_classifier)
+
+
+    """
+    Allgemeine Methode zum Öffnen eines Dialogfelds zur Dateiauswahl.
+
+    :param title: Titel des Dialogfelds.
+    :param filetypes: Dateitypenfilter für das Dialogfeld.
+    :return: Pfad zur ausgewählten Datei oder None, falls abgebrochen.
+    """
+    def _open_file(self, title, filetypes):
         
         file_path = filedialog.askopenfilename(title=title, filetypes=filetypes)
         if file_path:

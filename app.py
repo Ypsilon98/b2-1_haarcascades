@@ -195,7 +195,7 @@ class App(QMainWindow):
 
         self.btn_choose_classifier = QPushButton("Eigenen Klassifizierer Laden")
         self.btn_choose_classifier.setEnabled(True)
-        self.btn_choose_classifier.clicked.connect(self.classifier_manager.load_classifier)
+        self.btn_choose_classifier.clicked.connect(self.classifier_manager.load_custom_classifier)
         buttons_layout.addWidget(self.btn_choose_classifier)
         #control_panel.addLayout(buttons_layout)
 
@@ -449,7 +449,7 @@ class App(QMainWindow):
     # Lädt ein Bild aus einer Datei.
     def load_image_from_file(self):
        
-        file_path = self.file_manager.open_file_dialog()
+        file_path = self.file_manager.open_file_picture()
         if file_path:
             self.static_image = self.file_manager.load_image(file_path)
             self.static_image = cv2.cvtColor(self.static_image, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, Umwandlung in RGB
