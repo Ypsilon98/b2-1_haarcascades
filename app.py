@@ -61,7 +61,7 @@ class App(QMainWindow):
         # Versuche Stylesheet zu laden
         try:    
             self.load_stylesheet("style_sheet.css")
-            self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
+            #self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
             self.i2 = cv2.imread("face_animation.jpg")
             self.i1 = cv2.imread("b2-1_haarcascades/face_animation.jpg")
 
