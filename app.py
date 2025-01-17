@@ -1,7 +1,8 @@
 import cv2
-from PySide6.QtWidgets import QMainWindow, QWidget, QPushButton, QLabel, QComboBox, QStatusBar
+import os
+from PySide6.QtWidgets import QMainWindow, QWidget, QPushButton, QLabel, QComboBox, QStatusBar, QMessageBox
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QSizePolicy 
-from PySide6.QtGui import QPixmap, QImage , QPainter, QColor
+from PySide6.QtGui import QPixmap, QImage , QPainter, QColor, QAction
 from PySide6.QtCore import QTimer, Qt, QRect
 import numpy as np
 from cameramanager import CameraManager
@@ -13,32 +14,37 @@ class App(QMainWindow):
     """
     Hauptklasse für die GUI-Anwendung.
 
-    Attributes: camera_manager (CameraManager): Instanz des CameraManager.
+    Attribute:  camera_manager (CameraManager): Instanz des CameraManager.
                 classifier_manager (ClassifierManager): Instanz des ClassifierManager.
                 file_manager (FileManager): Instanz des FileManager.
-
-                central_widget (QWidget): Zentrales Widget der GUI.
-                status (QStatusBar): Statusleiste der GUI.
+                
+                central_widget (QWidget): Zentrales Widget der Anwendung.
+                menu_bar (QMenuBar): Menüleiste der Anwendung.
                 image_display (QLabel): Anzeigebereich für Bilder/Kamera.
                 animation_label (QLabel): Label für die Beispielanimation.
-
-                btn_refresh_cameras (QPushButton): Button zum Aktualisieren der Kameras.
-                btn_load_image (QPushButton): Button zum Laden von Bildern/Videos.
-                btn_start_camera (QPushButton): Button zum Starten/Stoppen der Kamera.
-                btn_stop_camera (QPushButton): Button zum Stoppen der Kamera.
-                btn_train_classifier (QPushButton): Button zum Trainieren des Klassifizierers.
-                camera_selector (QComboBox): Dropdown-Liste für Kameras.
-                mode_selector (QComboBox): Dropdown-Liste für Modusauswahl.
+                camera_selector (QComboBox): Dropdown-Menü für Kameraauswahl.
+                mode_selector (QComboBox): Dropdown-Menü für Modusauswahl.
                 
-                face_count_label (QLabel): Anzeige für erkannte Gesichter.
+                btn_refresh_cameras (QPushButton): Button zum Aktualisieren der Kameras.
+                btn_load_image (QPushButton): Button zum Laden von Bildern.
+                btn_start_camera (QPushButton): Button zum Starten/Stoppen der Kamera.
+                classifier_selector (QComboBox): Dropdown-Menü für Klassifizierer.
+                btn_choose_classifier (QPushButton): Button zum Laden von Klassifizierern.
+                btn_train_classifier (QPushButton): Button zum Trainieren von Klassifizierern.
+                btn_screenshot (QPushButton): Button zum Erstellen von Screenshots.
+
+                num_objects (int): Anzahl der erkannten Gesichter.
+                object_count_label (QLabel): Label für die Anzahl der erkannten Objekte.
 
                 timer (QTimer): Timer für die Aktualisierung der Frames.
                 animation_timer (QTimer): Timer für die Beispielanimation.
-                
-                current_frame (np.ndarray): Aktuelles Frame der Kamera.
-                static_image (np.ndarray): Statisches Bild/Video
 
-    Methods: __init__, load_stylesheet, refresh_camera_list, start_camera, stop_camera, start_stop_camera, load_image_from_file, update_frame, animation, draw_haar_filter
+                current_frame (np.ndarray): Aktuelles Frame von der Kamera.
+                static_image (np.ndarray): Statisches Bild aus Datei.
+
+     Methoden:  __init__, animation, draw_haar_filter,toggle_fullscreen,toggle_nightmode, show_help,
+                show_about, load_stylesheet, change_mode, refresh_camera_list, start_camera, stop_camera,
+                start_stop_camera, load_image_from_file, update_frame, 
     """
     def __init__(self):
         # Initialisiert die GUI und die Manager-Instanzen.
@@ -49,7 +55,7 @@ class App(QMainWindow):
         self.classifier_manager = ClassifierManager()
         self.file_manager = FileManager()
 
-        self.setWindowTitle("Gesichtserkennung mit Haarcascades")   # Fenstertitel
+        self.setWindowTitle("Objekterkennung mit Haarcascades")   # Fenstertitel
         self.setGeometry(100, 100, 1000, 700)  # Default Fenstergröße festlegen
 
         # Versuche Stylesheet zu laden
@@ -75,6 +81,31 @@ class App(QMainWindow):
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
+        # Create the menu bar
+        menu_bar = self.menuBar()
+        view_menu = menu_bar.addMenu("Ansicht")
+        self.fullscreen_action = QAction("Vollbild",self)
+        self.fullscreen_action.triggered.connect(self.toggle_fullscreen)
+        view_menu.addAction(self.fullscreen_action)
+
+        self.is_nightmode = False # Nachtmodus deaktiviert
+        self.nightmode_action = QAction("Nachtmodus",self)
+        self.nightmode_action.triggered.connect(self.toggle_nightmode)
+        view_menu.addAction(self.nightmode_action)
+
+
+        help_menu = menu_bar.addMenu("Info")
+        help_action = QAction("Kurzanleitung",self)
+        help_action.triggered.connect(self.show_help)
+        help_menu.addAction(help_action)
+
+        about_action = QAction("Über", self)
+        about_action.triggered.connect(self.show_about)
+        help_menu.addAction(about_action)
+        end_action = QAction("Beenden", self)
+        end_action.triggered.connect(self.close)
+        help_menu.addAction(end_action)
+
         # Main Layout
         debug_layout = QVBoxLayout(self.central_widget)
         main_layout = QHBoxLayout()
@@ -82,10 +113,10 @@ class App(QMainWindow):
         self.status = QStatusBar()
         debug_layout.addWidget(self.status)
         
-
         # Kamera- und Bildanzeigebereich
         self.image_display = QLabel("Anzeigebereich für Bilder/Kamera")
-        self.image_display.setStyleSheet("background-color: #dcdcdc; border: 1px solid black;")
+        #self.image_display.setStyleSheet("background-color: #dcdcdc; border: 1px solid black;")
+        self.image_display.setProperty("status", "display")
         self.image_display.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.image_display.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.image_display.setMinimumSize(300,300)
@@ -132,7 +163,7 @@ class App(QMainWindow):
         # Buttons Layout
         buttons_layout = QVBoxLayout()
         # Bild laden
-        self.btn_load_image = QPushButton("Bild/Video Laden")
+        self.btn_load_image = QPushButton("Bild Laden")
         self.btn_load_image.clicked.connect(self.load_image_from_file)
         buttons_layout.addWidget(self.btn_load_image)
 
@@ -145,9 +176,19 @@ class App(QMainWindow):
         classifier_layout = QHBoxLayout()
         self.classifier_selector = QComboBox()
         self.classifier_selector.setEnabled(True)
-        self.classifier_selector.addItems(["face"])
-        self.classifier_selector.addItems(["eyes"])
-        self.classifier_selector.addItems(["smile"])
+        
+        try:
+            if os.path.exists("classifier"):
+                classifier_xml = [c for c in os.listdir("classifier") if c.endswith(".xml")]
+                for xml in classifier_xml:
+                    self.classifier_selector.addItem(xml)
+            elif os.path.exists("b2-1_haarcascades/classifier"):
+                classifier_xml = [c for c in os.listdir("b2-1_haarcascades/classifier") if c.endswith(".xml")]
+                for xml in classifier_xml:
+                    self.classifier_selector.addItem(xml)
+        except:
+            print("Fehler beim Laden der Klassifizierer.")
+
         classifier_layout.addWidget(QLabel("Klassifizierer:"))
         classifier_layout.addWidget(self.classifier_selector)
         buttons_layout.addLayout(classifier_layout)
@@ -162,14 +203,25 @@ class App(QMainWindow):
         self.btn_train_classifier.setEnabled(False)
         #self.btn_train_classifier.clicked.connect(self.classifier_manager.train_classifier)
         buttons_layout.addWidget(self.btn_train_classifier)
+
+        self.btn_screenshot = QPushButton("Screenshot")
+        self.btn_screenshot.setEnabled(False)
+        buttons_layout.addWidget(self.btn_screenshot)
         control_panel.addLayout(buttons_layout)
 
-        # Erkannte Gesichter Label
-        self.face_count_label = QLabel("")
-        self.face_count_label.setText(f"<a href=\"http://www.easteregg.com\"> Erkannte Gesichter: {self.x} </a>")
-        self.face_count_label.setOpenExternalLinks(True)
-        self.face_count_label.setAlignment(Qt.AlignmentFlag.AlignRight)
-        control_panel.addWidget(self.face_count_label)
+        # Erkannte Objekte Label
+        objects_layout = QHBoxLayout()
+        self.num_objects = 0 # Anzahl der erkannten Objekte
+        self.object_count_label = QLabel("")
+        self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
+        self.object_count_label.setOpenExternalLinks(True)
+        self.object_count_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.object_count_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        self.object_count_label.setStyleSheet("font-weight: bold;")
+        objects_layout.addWidget(QLabel("Erkannte Objekte: "))
+        objects_layout.addWidget(self.object_count_label)
+        control_panel.addLayout(objects_layout)
+
         main_layout.addLayout(control_panel)
 
         # Timer für die Aktualisierung der Frames
@@ -244,8 +296,45 @@ class App(QMainWindow):
         painter.end()
         self.animation_label.setPixmap(overlay_pixmap)
 
-
+    # Schaltet zwischen Vollbildmodus und Fenstermodus um.
+    def toggle_fullscreen(self):
+        if self.isFullScreen():
+            self.showNormal()
+            self.fullscreen_action.setText("Vollbild")
+        else:
+            self.showFullScreen()
+            self.fullscreen_action.setText("Fenstermodus")
+        pass
     
+    # Schaltet zwischen Nachtmodus und Tagmodus (stylesheets) um.
+    def toggle_nightmode(self):
+        # Versuche Stylesheet zu laden
+        if self.is_nightmode:
+            try:    
+                self.load_stylesheet("style_sheet.css")
+                self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
+            # Fehlerbehandlung beim Laden des Stylesheets
+            except: 
+                print("Fehler beim Laden des Stylesheets, stelle sicher das du im richtigen Verzeichnis ../b2-1_haarcascades/main.py startest")
+            self.nightmode_action.setText("Nachtmodus")
+        else:
+            try:    
+                self.load_stylesheet("night_mode.css")
+                self.load_stylesheet("b2-1_haarcascades/night_mode.css")
+            # Fehlerbehandlung beim Laden des Stylesheets
+            except: 
+                print("Fehler beim Laden des Stylesheets, stelle sicher das du im richtigen Verzeichnis ../b2-1_haarcascades/main.py startest")
+            self.nightmode_action.setText("Tagmodus")
+        # Update the night mode state
+        self.is_nightmode = not self.is_nightmode   
+        pass
+    
+    def show_help(self):
+        QMessageBox.about(self, "Kurzanleitung",  "Kamera und Modus auswählen und auf Live-Kamera Starten klicken.\n\nAlternativ Modus auf 'file' setzen und Bild Laden.\n\nObjekte werden automatisch erkannt, markiert und gezählt.\n\nVortrainierte als auch eigene Klassifizierer können geladen werden.\n\nDazu einfach den entsprechenden Button klicken und die XML-Datei auswählen.\n\nViel Spaß!")
+
+    def show_about(self):
+        QMessageBox.about(self, "Über", "Anwendung zur Objekterkennung mit Haarcascades\n\nProgrammiert von der Projektgruppe B2-1 im Master AKI an der FH SWF Iserlohn\n\nYannick\nEmilie\nLeon\nPhilipp\n\nJanuar 2025")
+
     # Lädt ein Stylesheet aus einer Datei.
     # Parameters: filename (str): Dateiname des Stylesheets.
     def load_stylesheet(self, filename):
@@ -255,8 +344,6 @@ class App(QMainWindow):
                 self.setStyleSheet(file.read())
         except FileNotFoundError:
             print(f"Error: Stylesheet file '{filename}' not found.")
-
-
 
     # Ändert den Modus basierend auf der Auswahl im Dropdown-Menü.
     def change_mode(self, text):
@@ -310,7 +397,6 @@ class App(QMainWindow):
     # Startet die Kamera.   
     def start_camera(self):
         
-        print("Versuche, die Kamera zu starten...")
         camera_index = self.camera_selector.currentIndex()  # Kamera-Index auswählen
         try:
             self.btn_refresh_cameras.setEnabled(False)
@@ -343,7 +429,7 @@ class App(QMainWindow):
         self.camera_manager.stop_camera()
         self.timer.stop()
         self.image_display.clear()  # Clear the pixmap from the label
-        self.image_display.setText("Live/Loaded Image Display Area")  # Optionale Standardnachricht
+        self.image_display.setText("Anzeigebereich für Bilder/Kamera")  # Optionale Standardnachricht
         self.status.showMessage("Kamera gestoppt.")
         pass
 
@@ -360,23 +446,18 @@ class App(QMainWindow):
         pass
 
     
-    # Lädt ein Bild oder Video aus einer Datei.
+    # Lädt ein Bild aus einer Datei.
     def load_image_from_file(self):
        
         file_path = self.file_manager.open_file_dialog()
         if file_path:
             self.static_image = self.file_manager.load_image(file_path)
-            if self.static_image is not None:
-                self.mode_selector.setCurrentText("file")
-                self.btn_start_camera.setChecked(False)
-                self.btn_start_camera.setEnabled(False)
-                #self.btn_load_image.setChecked(True)
-                #self.btn_load_image.setEnabled(True)
-                self.timer.start(10)
+            self.static_image = cv2.cvtColor(self.static_image, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, Umwandlung in RGB
+            self.btn_start_camera.setEnabled(False)
+            self.timer.start(50)
 
     # Holt ein Frame von der Kamera und zeigt es in der GUI an. 
     def update_frame(self):
-        
         if self.mode_selector.currentText() == "live":
             frame, ret = self.camera_manager.get_frame()
             if not ret: # Wenn Kamera keine Frames mehr liefert/disconnected, stoppe Kamera und aktualisiere Kamera-Liste
@@ -384,31 +465,63 @@ class App(QMainWindow):
                 self.refresh_camera_list()
                 self.btn_start_camera.setChecked(False)
                 return  
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, Umwandlung in RGB
+        
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, Umwandlung in RGB
 
-        # Gesichtserkennung
-        faces = self.classifier_manager.detect_faces(frame)
-        num_faces = len(faces)
+            # Objekterkennung
+            objects = self.classifier_manager.detect_faces(frame)
+            self.num_objects = len(objects) # Anzahl der erkannten Objekte
+            self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
+                
+            # Zeichne grüne Rechtecke um erkannte Gesichter
+            for (x, y, w, h) in objects:
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
 
-        # Zeichne grüne Rechtecke um erkannte Gesichter
-        for (x, y, w, h) in faces:
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            height, width, channel = frame.shape # Größe des Frames
+            aspect_ratio = height/width # Seitenverhältnis
+            bytes_per_line = 3 * width  # 3 Kanäle pro Pixel (RGB)
 
-        height, width, channel = frame.shape # Größe des Frames
-        aspect_ratio = height/width # Seitenverhältnis
-        bytes_per_line = 3 * width  # 3 Kanäle pro Pixel (RGB)
+            q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888) # Erstelle QImage aus Frame 
+            pixmap = QPixmap.fromImage(q_image) # Erstelle Pixmap aus QImage
 
-        q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888) # Erstelle QImage aus Frame 
-        pixmap = QPixmap.fromImage(q_image) # Erstelle Pixmap aus QImage
+            # Logik für das Skalieren des Bildes
+            i_h = self.image_display.height() # Höhe des QLabel(image_display)
+            w_asp = int(i_h * (width/height)) # Berechne Breite des Bildes basierend auf Höhe und Seitenverhältnis
+            if(w_asp <= self.image_display.width()): 
+                i_w = w_asp 
+            else:
+                i_w = self.image_display.width()
+                i_h = int(i_w * aspect_ratio)
+            scaled_pixmap = pixmap.scaled(i_w,i_h) 
+            self.image_display.setPixmap(scaled_pixmap) # Setze Pixmap in QLabel(image_display)
 
-        # Logik für das Skalieren des Bildes
-        i_h = self.image_display.height() # Höhe des QLabel(image_display)
-        w_asp = int(i_h * (width/height)) # Berechne Breite des Bildes basierend auf Höhe und Seitenverhältnis
-        if(w_asp <= self.image_display.width()): 
-            i_w = w_asp 
-        else:
-            i_w = self.image_display.width()
-            i_h = int(i_w * aspect_ratio)
-        scaled_pixmap = pixmap.scaled(i_w,i_h) 
-        self.image_display.setPixmap(scaled_pixmap) # Setze Pixmap in QLabel(image_display)
+        elif self.mode_selector.currentText() == "file":
+            
+            frame = self.static_image
+            # Objekterkennung
+            objects = self.classifier_manager.detect_faces(frame)
+            self.num_objects = len(objects) # Anzahl der erkannten Objekte
+            self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
+                
+            # Zeichne grüne Rechtecke um erkannte Gesichter
+            for (x, y, w, h) in objects:
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
+
+            height, width, channel = frame.shape # Größe des Frames
+            aspect_ratio = height/width # Seitenverhältnis
+            bytes_per_line = 3 * width  # 3 Kanäle pro Pixel (RGB)
+
+            q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888) # Erstelle QImage aus Frame 
+            pixmap = QPixmap.fromImage(q_image) # Erstelle Pixmap aus QImage
+
+            # Logik für das Skalieren des Bildes
+            i_h = self.image_display.height() # Höhe des QLabel(image_display)
+            w_asp = int(i_h * (width/height)) # Berechne Breite des Bildes basierend auf Höhe und Seitenverhältnis
+            if(w_asp <= self.image_display.width()): 
+                i_w = w_asp 
+            else:
+                i_w = self.image_display.width()
+                i_h = int(i_w * aspect_ratio)
+            scaled_pixmap = pixmap.scaled(i_w,i_h) 
+            self.image_display.setPixmap(scaled_pixmap) # Setze Pixmap in QLabel(image_display)         
         pass
