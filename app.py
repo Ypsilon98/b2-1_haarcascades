@@ -18,6 +18,7 @@ class App(QMainWindow):
                 file_manager (FileManager): Instanz des FileManager.
                 
                 central_widget (QWidget): Zentrales Widget der Anwendung.
+                menu_bar (QMenuBar): Menüleiste der Anwendung.
                 image_display (QLabel): Anzeigebereich für Bilder/Kamera.
                 animation_label (QLabel): Label für die Beispielanimation.
                 camera_selector (QComboBox): Dropdown-Menü für Kameraauswahl.
@@ -40,8 +41,9 @@ class App(QMainWindow):
                 current_frame (np.ndarray): Aktuelles Frame von der Kamera.
                 static_image (np.ndarray): Statisches Bild/Video aus Datei.
 
-     Methoden:  __init__, animation, draw_haar_filter, load_stylesheet, change_mode, refresh_camera_list,
-                start_camera, stop_camera, start_stop_camera, load_image_from_file, update_frame
+     Methoden:  __init__, animation, draw_haar_filter,toggle_fullscreen,toggle_nightmode, show_help,
+                show_about, load_stylesheet, change_mode, refresh_camera_list, start_camera, stop_camera,
+                start_stop_camera, load_image_from_file, update_frame, 
     """
     def __init__(self):
         # Initialisiert die GUI und die Manager-Instanzen.
@@ -294,8 +296,9 @@ class App(QMainWindow):
         else:
             self.showFullScreen()
             self.fullscreen_action.setText("Fenstermodus")
+        pass
     
-        # Schaltet zwischen Nachtmodus und Tagmodus (stylesheets) um.
+    # Schaltet zwischen Nachtmodus und Tagmodus (stylesheets) um.
     def toggle_nightmode(self):
         # Versuche Stylesheet zu laden
         if self.is_nightmode:
@@ -324,8 +327,6 @@ class App(QMainWindow):
     def show_about(self):
         QMessageBox.about(self, "Über", "Anwendung zur Objekterkennung mit Haarcascades\n\nProgrammiert von der Projektgruppe B2-1 im Master AKI an der FH SWF Iserlohn\n\nYannick\nEmilie\nLeon\nPhilipp\n\nJanuar 2025")
 
-
-    
     # Lädt ein Stylesheet aus einer Datei.
     # Parameters: filename (str): Dateiname des Stylesheets.
     def load_stylesheet(self, filename):
@@ -335,8 +336,6 @@ class App(QMainWindow):
                 self.setStyleSheet(file.read())
         except FileNotFoundError:
             print(f"Error: Stylesheet file '{filename}' not found.")
-
-
 
     # Ändert den Modus basierend auf der Auswahl im Dropdown-Menü.
     def change_mode(self, text):
@@ -390,7 +389,6 @@ class App(QMainWindow):
     # Startet die Kamera.   
     def start_camera(self):
         
-        print("Versuche, die Kamera zu starten...")
         camera_index = self.camera_selector.currentIndex()  # Kamera-Index auswählen
         try:
             self.btn_refresh_cameras.setEnabled(False)
