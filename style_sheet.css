@@ -7,6 +7,7 @@ QMainWindow {
 QLabel {
     font-family: 'Segoe UI';
     font-weight: bold;
+    color: black;
     font-size: 14px;
 }
 
@@ -14,6 +15,7 @@ QLabel[status="display"] {
     font-family: 'Segoe UI';
     font-weight: bold;
     font-size: 14px;
+    color: black;
     background-color: #dcdcdc; /* Light Gray */ 
     border: 1px solid black;
 }
@@ -82,4 +84,12 @@ QMessageBox {
 QMessageBox QLabel {
     font-size: 12px;
     font-weight: normal;
+}
+
+QStatusBar {  
+    color: black;             
+}
+
+QComboBox {
+    color: black;
 }
