@@ -502,10 +502,10 @@ class App(QMainWindow):
             self.classifier_selector.setEnabled(True)
             self.mode_selector.setEnabled(True)
 
-            self.btn_start_camera.setProperty("status","start")
-            self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
-            self.btn_start_camera.style().polish(self.btn_start_camera)    # Reapply style
-            self.btn_start_camera.setText("Bild Laden")
+            self.btn_load_image.setProperty("status","start")
+            self.btn_load_image.style().unpolish(self.btn_load_image)  # Reset style
+            self.btn_load_image.style().polish(self.btn_load_image)    # Reapply style
+            self.btn_load_image.setText("Bild Laden")
             self.status.showMessage("Bild wird zurückgesetzt...")
             self.static_image = None
             self.timer.stop()
