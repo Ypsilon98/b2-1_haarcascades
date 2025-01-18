@@ -351,7 +351,6 @@ class App(QMainWindow):
             self.btn_load_image.setProperty("status","unavailable")
             self.btn_load_image.style().unpolish(self.btn_load_image)
             self.btn_load_image.style().polish(self.btn_load_image)
-            self.reset_image()
         elif text == "file":
             self.btn_start_camera.setEnabled(False)
             self.btn_start_camera.setProperty("status", "unavailable")
