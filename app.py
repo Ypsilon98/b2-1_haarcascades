@@ -187,11 +187,14 @@ class App(QMainWindow):
         classifier_layout.addWidget(self.classifier_selector)
         buttons_layout.addLayout(classifier_layout)
 
+        # Label zur Anzeige des Namens der benutzerdefinierten Klassifizierer-XML-Datei
+        self.custom_classifier_label = QLabel("")
+        buttons_layout.addWidget(self.custom_classifier_label)
+
         self.btn_choose_classifier = QPushButton("Eigener Klassifizierer Laden")
         self.btn_choose_classifier.setEnabled(False)
-        self.btn_choose_classifier.clicked.connect(self.classifier_manager.load_custom_classifier)
+        self.btn_choose_classifier.clicked.connect(self.load_custom_classifier)
         buttons_layout.addWidget(self.btn_choose_classifier)
-        #control_panel.addLayout(buttons_layout)
 
         self.btn_train_classifier = QPushButton("Klassifizierer Trainieren")
         self.btn_train_classifier.setEnabled(False)
@@ -385,6 +388,15 @@ class App(QMainWindow):
             self.classifier_manager.load_classifier("face")
         pass
 
+
+    def update_custom_classifier_label(self, classifier_name):
+        self.custom_classifier_label.setText(classifier_name)
+
+    def load_custom_classifier(self):
+        classifier_name = self.classifier_manager.load_custom_classifier()
+        self.update_custom_classifier_label(classifier_name)
+        pass
+
     # Aktualisiert die Liste der verfügbaren Kameras.
     def refresh_camera_list(self):
         
@@ -531,6 +543,9 @@ class App(QMainWindow):
             self.reset_image()
             print("Bild zurücksetzen...")
         pass
+
+
+
 
     # Holt ein Frame von der Kamera und zeigt es in der GUI an. 
     def update_frame(self):
