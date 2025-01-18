@@ -26,10 +26,14 @@ class ClassifierManager:
         file_path = self.file_manager.open_file_classifier()
         if file_path:
             self.face_cascade = cv2.CascadeClassifier(file_path)
+            self.custom_classifier_name = file_path.split("/")[-1]
         else:
-            self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+            if hasattr(self, 'custom_classifier_name'):
+                return self.custom_classifier_name
+            else:
+                return "Datei auswählen..."
 
-        return file_path.split("/")[-1] if file_path else "Keine Datei ausgewählt!"
+        return self.custom_classifier_name
     
 
     """

@@ -370,6 +370,7 @@ class App(QMainWindow):
     
     def change_classifier(self, text):
         self.btn_choose_classifier.setEnabled(False)
+        self.custom_classifier_label.setText("")
         if text == "face":
             self.classifier_manager.load_classifier("face")
         elif text == "eye":
@@ -384,17 +385,14 @@ class App(QMainWindow):
             self.classifier_manager.load_classifier("profileface")
         elif text == "Eigener Klassifizierer":
             self.btn_choose_classifier.setEnabled(True)
+            self.custom_classifier_label.setText("Datei auswählen...")
         else:
             self.classifier_manager.load_classifier("face")
         pass
 
-
-    def update_custom_classifier_label(self, classifier_name):
-        self.custom_classifier_label.setText(classifier_name)
-
     def load_custom_classifier(self):
         classifier_name = self.classifier_manager.load_custom_classifier()
-        self.update_custom_classifier_label(classifier_name)
+        self.custom_classifier_label.setText(classifier_name)
         pass
 
     # Aktualisiert die Liste der verfügbaren Kameras.
@@ -429,6 +427,7 @@ class App(QMainWindow):
             self.camera_selector.setEnabled(False)
             self.mode_selector.setEnabled(False)
             self.classifier_selector.setEnabled(False)
+            self.load_custom_classifier.setEnabled(False)
             self.btn_start_camera.setProperty("status","stop")
             self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
             self.btn_start_camera.style().polish(self.btn_start_camera)    # Reapply style
@@ -449,6 +448,7 @@ class App(QMainWindow):
         self.camera_selector.setEnabled(True)
         self.mode_selector.setEnabled(True)
         self.classifier_selector.setEnabled(True)
+        self.load_custom_classifier.setEnabled(True)
         self.btn_start_camera.setProperty("status","start")
         self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
         self.btn_start_camera.style().polish(self.btn_start_camera)    # Reapply style
