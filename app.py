@@ -435,13 +435,13 @@ class App(QMainWindow):
     def stop_camera(self):
 
         self.btn_refresh_cameras.setEnabled(True)
+        self.camera_selector.setEnabled(True)
+        self.mode_selector.setEnabled(True)
+        self.classifier_selector.setEnabled(True)
         self.btn_start_camera.setProperty("status","start")
         self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
         self.btn_start_camera.style().polish(self.btn_start_camera)    # Reapply style
         self.btn_start_camera.setText("Live-Kamera Starten")
-        self.camera_selector.setEnabled(True)
-        self.classifier_selector.setEnabled(True)
-        self.mode_selector.setEnabled(True)
         self.status.showMessage("Kamera wird gestoppt...")
         self.camera_manager.stop_camera()
         self.timer.stop()
@@ -470,17 +470,55 @@ class App(QMainWindow):
     # Lädt ein Bild aus einer Datei.
     def load_image_from_file(self):
        
-        file_path = self.file_manager.open_file_picture()
-        if file_path:
-            self.static_image = self.file_manager.load_image(file_path)
-            self.static_image = cv2.cvtColor(self.static_image, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, Umwandlung in RGB
-            self.btn_start_camera.setEnabled(False)
-            self.timer.start(50)
+        try:
+            self.btn_refresh_cameras.setEnabled(False)
+            self.camera_selector.setEnabled(False)
+            self.mode_selector.setEnabled(False)
+            self.classifier_selector.setEnabled(False)
+            self.btn_load_image.setProperty("status","stop")
+            self.btn_load_image.style().unpolish(self.btn_load_image)  # Reset style
+            self.btn_load_image.style().polish(self.btn_load_image)    # Reapply style
+            self.btn_load_image.setText("Bild Reset")
+            self.status.showMessage("Bild wird geladen...")
+            file_path = self.file_manager.open_file_picture()
+            if file_path:
+                self.static_image = self.file_manager.load_image(file_path)
+                self.static_image = cv2.cvtColor(self.static_image, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, Umwandlung in RGB
+                self.btn_start_camera.setEnabled(False)
+                self.timer.start(50)
+                self.status.showMessage(f"Bild {file_path} erfolgreich geladen.")
+                print(f"Bild {file_path} erfolgreich geladen.")    
+
+        except Exception as e:
+            self.status.showMessage(f"Fehler beim Laden des Bildes: {str(e)}")
+            print(f"Fehler beim Laden des Bildes: {str(e)}")
+        pass
 
     # Setzt das Bild zurück.
     def reset_image(self):
-        self.static_image = None
-        self.timer.start(50)
+        try:
+            self.btn_refresh_cameras.setEnabled(True)
+            self.camera_selector.setEnabled(True)
+            self.classifier_selector.setEnabled(True)
+            self.mode_selector.setEnabled(True)
+
+            self.btn_start_camera.setProperty("status","start")
+            self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
+            self.btn_start_camera.style().polish(self.btn_start_camera)    # Reapply style
+            self.btn_start_camera.setText("Bild Laden")
+            self.status.showMessage("Bild wird zurückgesetzt...")
+            self.static_image = None
+            self.timer.stop()
+            self.image_display.clear()
+            self.image_display.setText("Anzeigebereich für Bilder/Kamera")
+            self.num_objects = 0
+            self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
+            self.status.showMessage("Bild zurückgesetzt.")
+            print("Bild zurückgesetzt.")
+        except Exception as e:
+            self.status.showMessage(f"Fehler beim Zurücksetzen des Bildes: {str(e)}")
+            print(f"Fehler beim Zurücksetzen des Bildes: {str(e)}")
+        pass
 
         
 
