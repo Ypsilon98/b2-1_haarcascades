@@ -546,6 +546,7 @@ class App(QMainWindow):
     # Erstellt einen Screenshot des aktuellen Frames.
     def save_screenshot(self):
         self.status.showMessage("Screenshot wird gespeichert...")
+        
         if self.file_manager.save_screenshot(self.current_frame):
             self.status.showMessage("Screenshot erfolgreich gespeichert.")
         else:
@@ -562,9 +563,8 @@ class App(QMainWindow):
                 self.refresh_camera_list()
                 self.btn_start_camera.setChecked(False)
                 return  
-        
+            
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, Umwandlung in RGB
-
             self.current_frame = frame
 
             # Objekterkennung
@@ -600,6 +600,8 @@ class App(QMainWindow):
         elif self.mode_selector.currentText() == "file":
             
             frame = self.static_image
+            self.current_frame = frame
+
             # Objekterkennung
             objects = self.classifier_manager.detect_faces(frame)
             self.num_objects = len(objects) # Anzahl der erkannten Objekte
@@ -608,8 +610,6 @@ class App(QMainWindow):
             # Zeichne grüne Rechtecke um erkannte Gesichter
             for (x, y, w, h) in objects:
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
-            
-            self.current_frame = frame
 
             height, width, channel = frame.shape # Größe des Frames
             aspect_ratio = height/width # Seitenverhältnis
@@ -635,4 +635,12 @@ class App(QMainWindow):
             self.btn_screenshot.setEnabled(True)
         else:
             self.btn_screenshot.setEnabled(False)
+
+
+        self.current_frame = cv2.cvtColor(self.current_frame, cv2.COLOR_RGB2BGR) # OpenCV (standard) BGR, Umwandlung in RGB
+
+         # Zeichne grüne Rechtecke um erkannte Gesichter
+        for (x, y, w, h) in objects:
+            cv2.rectangle(self.current_frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
+
         pass
