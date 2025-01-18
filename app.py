@@ -480,6 +480,8 @@ class App(QMainWindow):
     # Setzt das Bild zurück.
     def reset_image(self):
         self.static_image = None
+        self.timer.start(50)
+
         
 
     # Lädt ein Bild aus einer Datei und setzt den Button zurück.
