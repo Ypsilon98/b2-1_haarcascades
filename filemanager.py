@@ -84,7 +84,11 @@ class FileManager:
     def save_screenshot(self, image):
 
         # Wähle den Dateipfad aus
-        file_path = self._open_file("Speicherort für Screenshot auswählen", [("PNG Dateien", "*.png"), ("JPEG Dateien", "*.jpg *.jpeg"), ("Alle Dateien", "*.*")])
+        file_path = filedialog.asksaveasfilename(
+            title="Speicherort für Screenshot auswählen",
+            defaultextension=".png",
+            filetypes=[("PNG Dateien", "*.png"), ("JPEG Dateien", "*.jpg *.jpeg"), ("Alle Dateien", "*.*")]
+        )
         
         if not file_path:
             print("Speichern abgebrochen.")
