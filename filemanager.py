@@ -75,3 +75,24 @@ class FileManager:
         else:
             print(f"Bild erfolgreich geladen: {file_path}")
         return image
+           
+        
+        
+    # Speichert einen Screenshot des aktuellen Frames mit grünen Rechtecken.
+    # :param image: Aktuelles image.
+    # :return: True, wenn der Screenshot erfolgreich gespeichert wurde, sonst False.
+    def save_screenshot(self, image):
+
+        # Wähle den Dateipfad aus
+        file_path = self._open_file("Speicherort für Screenshot auswählen", [("PNG Dateien", "*.png"), ("JPEG Dateien", "*.jpg *.jpeg"), ("Alle Dateien", "*.*")])
+        
+        if not file_path:
+            print("Speichern abgebrochen.")
+            return False
+        
+        if cv2.imwrite(file_path, image):
+            print(f"Bild erfolgreich gespeichert: {file_path}")
+            return True
+        else:
+            print(f"Fehler: Bild konnte nicht gespeichert werden.")
+            return False

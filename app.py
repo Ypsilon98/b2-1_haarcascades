@@ -203,6 +203,7 @@ class App(QMainWindow):
 
         self.btn_screenshot = QPushButton("Screenshot")
         self.btn_screenshot.setEnabled(False)
+        self.btn_screenshot.clicked.connect(self.save_screenshot)
         buttons_layout.addWidget(self.btn_screenshot)
         control_panel.addLayout(buttons_layout)
 
@@ -542,7 +543,14 @@ class App(QMainWindow):
             print("Bild zurücksetzen...")
         pass
 
-
+    # Erstellt einen Screenshot des aktuellen Frames.
+    def save_screenshot(self):
+        self.status.showMessage("Screenshot wird gespeichert...")
+        if self.file_manager.save_screenshot(self.current_frame):
+            self.status.showMessage("Screenshot erfolgreich gespeichert.")
+        else:
+            self.status.showMessage("Fehler: Screenshot konnte nicht gespeichert werden.")
+        pass
 
 
     # Holt ein Frame von der Kamera und zeigt es in der GUI an. 
@@ -583,6 +591,7 @@ class App(QMainWindow):
                 i_h = int(i_w * aspect_ratio)
             scaled_pixmap = pixmap.scaled(i_w,i_h) 
             self.image_display.setPixmap(scaled_pixmap) # Setze Pixmap in QLabel(image_display)
+            self.current_frame = self.image_display.pixmap().toImage()
 
         elif self.mode_selector.currentText() == "file":
             
@@ -613,4 +622,11 @@ class App(QMainWindow):
                 i_h = int(i_w * aspect_ratio)
             scaled_pixmap = pixmap.scaled(i_w,i_h) 
             self.image_display.setPixmap(scaled_pixmap) # Setze Pixmap in QLabel(image_display)         
+            self.current_frame = self.image_display.pixmap().toImage()
+
+
+        if not self.current_frame.isNull():
+            self.btn_screenshot.setEnabled(True)
+        else:
+            self.btn_screenshot.setEnabled(False)
         pass
