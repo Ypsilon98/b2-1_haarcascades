@@ -162,9 +162,12 @@ class App(QMainWindow):
 
         # Buttons Layout
         buttons_layout = QVBoxLayout()
+
         # Bild laden
         self.btn_load_image = QPushButton("Bild Laden")
-        self.btn_load_image.clicked.connect(self.load_image_from_file)
+        self.btn_load_image.setCheckable(True)
+        self.btn_load_image.setEnabled(False)
+        self.btn_load_image.clicked.connect(self.load_reset_file)
         buttons_layout.addWidget(self.btn_load_image)
 
         self.btn_start_camera = QPushButton("Live-Kamera Starten")
@@ -173,20 +176,7 @@ class App(QMainWindow):
         self.btn_start_camera.clicked.connect(self.start_stop_camera)
         buttons_layout.addWidget(self.btn_start_camera)
         
-        """
-        try:
-            if os.path.exists("classifier"):
-                classifier_xml = [c for c in os.listdir("classifier") if c.endswith(".xml")]
-                for xml in classifier_xml:
-                    self.classifier_selector.addItem(xml)
-            elif os.path.exists("b2-1_haarcascades/classifier"):
-                classifier_xml = [c for c in os.listdir("b2-1_haarcascades/classifier") if c.endswith(".xml")]
-                for xml in classifier_xml:
-                    self.classifier_selector.addItem(xml)
-        except:
-            print("Fehler beim Laden der Klassifizierer.")
-        """
-
+    
         classifier_layout = QHBoxLayout()
         self.classifier_selector = QComboBox()
         self.classifier_selector.setEnabled(True)
@@ -361,6 +351,7 @@ class App(QMainWindow):
             self.btn_load_image.setProperty("status","unavailable")
             self.btn_load_image.style().unpolish(self.btn_load_image)
             self.btn_load_image.style().polish(self.btn_load_image)
+            self.reset_image()
         elif text == "file":
             self.btn_start_camera.setEnabled(False)
             self.btn_start_camera.setProperty("status", "unavailable")
@@ -462,6 +453,7 @@ class App(QMainWindow):
         self.status.showMessage("Kamera gestoppt.")
         pass
 
+
     # Startet oder stoppt die Kamera, je nach Status des Buttons.
     def start_stop_camera(self,checked):
 
@@ -484,6 +476,22 @@ class App(QMainWindow):
             self.static_image = cv2.cvtColor(self.static_image, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, Umwandlung in RGB
             self.btn_start_camera.setEnabled(False)
             self.timer.start(50)
+
+    # Setzt das Bild zurück.
+    def reset_image(self):
+        self.static_image = None
+        
+
+    # Lädt ein Bild aus einer Datei und setzt den Button zurück.
+    def load_reset_file(self, checked):
+
+        if checked:
+            self.load_image_from_file()
+            print("Bild laden...")
+        else:
+            self.reset_image()
+            print("Bild zurücksetzen...")
+        pass
 
     # Holt ein Frame von der Kamera und zeigt es in der GUI an. 
     def update_frame(self):
