@@ -565,6 +565,8 @@ class App(QMainWindow):
         
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, Umwandlung in RGB
 
+            self.current_frame = frame
+
             # Objekterkennung
             objects = self.classifier_manager.detect_faces(frame)
             self.num_objects = len(objects) # Anzahl der erkannten Objekte
@@ -573,6 +575,8 @@ class App(QMainWindow):
             # Zeichne grüne Rechtecke um erkannte Gesichter
             for (x, y, w, h) in objects:
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
+            
+            
 
             height, width, channel = frame.shape # Größe des Frames
             aspect_ratio = height/width # Seitenverhältnis
@@ -591,7 +595,7 @@ class App(QMainWindow):
                 i_h = int(i_w * aspect_ratio)
             scaled_pixmap = pixmap.scaled(i_w,i_h) 
             self.image_display.setPixmap(scaled_pixmap) # Setze Pixmap in QLabel(image_display)
-            self.current_frame = self.image_display.pixmap().toImage()
+            
 
         elif self.mode_selector.currentText() == "file":
             
@@ -604,6 +608,8 @@ class App(QMainWindow):
             # Zeichne grüne Rechtecke um erkannte Gesichter
             for (x, y, w, h) in objects:
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
+            
+            self.current_frame = frame
 
             height, width, channel = frame.shape # Größe des Frames
             aspect_ratio = height/width # Seitenverhältnis
@@ -622,10 +628,10 @@ class App(QMainWindow):
                 i_h = int(i_w * aspect_ratio)
             scaled_pixmap = pixmap.scaled(i_w,i_h) 
             self.image_display.setPixmap(scaled_pixmap) # Setze Pixmap in QLabel(image_display)         
-            self.current_frame = self.image_display.pixmap().toImage()
+            
 
 
-        if not self.current_frame.isNull():
+        if not self.current_frame is None:
             self.btn_screenshot.setEnabled(True)
         else:
             self.btn_screenshot.setEnabled(False)
