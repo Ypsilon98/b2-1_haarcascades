@@ -427,7 +427,6 @@ class App(QMainWindow):
             self.camera_selector.setEnabled(False)
             self.mode_selector.setEnabled(False)
             self.classifier_selector.setEnabled(False)
-            self.load_custom_classifier.setEnabled(False)
             self.btn_start_camera.setProperty("status","stop")
             self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
             self.btn_start_camera.style().polish(self.btn_start_camera)    # Reapply style
@@ -448,7 +447,6 @@ class App(QMainWindow):
         self.camera_selector.setEnabled(True)
         self.mode_selector.setEnabled(True)
         self.classifier_selector.setEnabled(True)
-        self.load_custom_classifier.setEnabled(True)
         self.btn_start_camera.setProperty("status","start")
         self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
         self.btn_start_camera.style().polish(self.btn_start_camera)    # Reapply style
