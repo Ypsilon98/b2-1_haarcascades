@@ -56,10 +56,12 @@ QComboBox {
 }
 
 QMenuBar {
+    color: black;
     background-color: #f0f0f0;
     border: 1px solid #ccc;
 }
 QMenuBar::item {
+    color: black;
     padding: 5px 10px;
     background: transparent;
 }
@@ -70,10 +72,11 @@ QMenuBar::item:selected {
 QMenu {
     background-color: #ffffff;
     border: 1px solid #ccc;
+    color: black;
 }
 QMenu::item:selected {
     background-color: #dcdcdc;
-    color: #000;
+    color: black;
 }
 
 QMessageBox {
@@ -92,4 +95,5 @@ QStatusBar {
 
 QComboBox {
     color: black;
+    background-color: white;
 }
