@@ -1,12 +1,13 @@
 import cv2
 from filemanager import FileManager
 
+# Klasse zum Verwalten von Klassifizierern und zum Erkennen von Objekten in einem Frame.
 class ClassifierManager:
 
     # Initialisiert den Klassifizierer-Manager.
     def __init__(self):
         
-        self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+        self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml") # Standard-Gesichtsklassifizierer wird geladen
         self.file_manager = FileManager()
         self.current_classifier = "face"
 
@@ -56,8 +57,10 @@ class ClassifierManager:
             }
         }
 
+    # Aktualisiert die Parameter des benutzerdefinierten Klassifizierers.
     def update_scaleFactor(self, value):
         self.classifiers["custom"]["scaleFactor"] = value
+    
     
     def update_minNeighbors(self, value):
         self.classifiers["custom"]["minNeighbors"] = value

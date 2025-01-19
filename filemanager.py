@@ -7,7 +7,10 @@ import cv2
 # Unterstützt die Auswahl von Bild- und XML-Dateien.
 
 class FileManager:
-
+    """
+    Klasse zum Verwalten von Dateioperationen.
+    Unterstützt die Auswahl von Bild- und XML-Dateien.
+    """
     
 
     # Initialisiert die Dateitypen-Filter für Bilder und Klassifizierungsdateien.
@@ -18,14 +21,14 @@ class FileManager:
 
 
 
-    """
-    Öffnet ein Dialogfeld zur Auswahl einer Bilddatei.
-
-    :param title: Titel des Dialogfelds (Standard: "Bild auswählen").
-    :return: Pfad zur ausgewählten Datei oder None, falls abgebrochen.
-    """
+    
     def open_file_picture(self, title="Bild auswählen"):
-        
+        """
+        Öffnet ein Dialogfeld zur Auswahl einer Bilddatei.
+
+        :param title: Titel des Dialogfelds (Standard: "Bild auswählen").
+        :return: Pfad zur ausgewählten Datei oder None, falls abgebrochen.
+        """
         return self._open_file(title, self.filetypes_pictures)
 
     
