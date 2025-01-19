@@ -92,5 +92,39 @@ QMessageBox QLabel {
 }
 
 QStatusBar {  
-    color: #ffffff;             
+    color: #ffffff;
+    background-color: gray;             
+}
+
+QSlider {
+    color: white;
+    background: transparent;
+}
+
+/* Laufbahn des Sliders */
+QSlider::groove:horizontal {
+    height: 6px;
+    background: gray;
+}
+
+/* Schieberegler des Sliders */
+QSlider::handle:horizontal {
+    background: white;
+    border: 1px solid gray;
+    width: 14px;
+    height: 14px;
+    margin: -4px 0; /* Zentrierung des Schiebereglers */
+    border-radius: 7px;
+}
+
+/* Farbe der Laufbahn vor Schieberegler */
+QSlider::sub-page:horizontal {
+    background: #0078D7; /* Microsoft Blue */
+    border-radius: 3px;
+}
+
+/* Farbe der Laufbahn nach Schieberegler */
+QSlider::add-page:horizontal {
+    background: gray;
+    border-radius: 3px;
 }

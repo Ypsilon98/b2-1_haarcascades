@@ -14,37 +14,9 @@ class App(QMainWindow):
     """
     Hauptklasse für die GUI-Anwendung.
 
-    Attribute:  camera_manager (CameraManager): Instanz des CameraManager.
-                classifier_manager (ClassifierManager): Instanz des ClassifierManager.
-                file_manager (FileManager): Instanz des FileManager.
-                
-                central_widget (QWidget): Zentrales Widget der Anwendung.
-                menu_bar (QMenuBar): Menüleiste der Anwendung.
-                image_display (QLabel): Anzeigebereich für Bilder/Kamera.
-                animation_label (QLabel): Label für die Beispielanimation.
-                camera_selector (QComboBox): Dropdown-Menü für Kameraauswahl.
-                mode_selector (QComboBox): Dropdown-Menü für Modusauswahl.
-                
-                btn_refresh_cameras (QPushButton): Button zum Aktualisieren der Kameras.
-                btn_load_image (QPushButton): Button zum Laden von Bildern.
-                btn_start_camera (QPushButton): Button zum Starten/Stoppen der Kamera.
-                classifier_selector (QComboBox): Dropdown-Menü für Klassifizierer.
-                btn_choose_classifier (QPushButton): Button zum Laden von Klassifizierern.
-                btn_train_classifier (QPushButton): Button zum Trainieren von Klassifizierern.
-                btn_screenshot (QPushButton): Button zum Erstellen von Screenshots.
+    Attribute:  
 
-                num_objects (int): Anzahl der erkannten Gesichter.
-                object_count_label (QLabel): Label für die Anzahl der erkannten Objekte.
-
-                timer (QTimer): Timer für die Aktualisierung der Frames.
-                animation_timer (QTimer): Timer für die Beispielanimation.
-
-                current_frame (np.ndarray): Aktuelles Frame von der Kamera.
-                static_image (np.ndarray): Statisches Bild aus Datei.
-
-     Methoden:  __init__, animation, draw_haar_filter,toggle_fullscreen,toggle_nightmode, show_help,
-                show_about, load_stylesheet, change_mode, refresh_camera_list, start_camera, stop_camera,
-                start_stop_camera, load_image_from_file, update_frame, 
+     Methoden:  
     """
     def __init__(self):
         # Initialisiert die GUI und die Manager-Instanzen.
@@ -56,12 +28,18 @@ class App(QMainWindow):
         self.file_manager = FileManager()
 
         self.setWindowTitle("Objekterkennung mit Haarcascades")   # Fenstertitel
-        self.setGeometry(100, 100, 1000, 700)  # Default Fenstergröße festlegen
+        self.setGeometry(100, 100, 1000, 700)  # Start-Fenstergröße festlegen
 
-        # Versuche Stylesheet zu laden
+        # Versuche Stylesheet zu laden (Sicherstellen das Programm im richtigen Verzeichnis gestartet wird)
         try:    
-            self.load_stylesheet("style_sheet.css")
-            self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
+            try:
+                self.load_stylesheet("style_sheet.css") # Um Fehlermeldung zu vermeiden
+            except:
+                pass
+            try:
+                self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
+            except:
+                pass
             self.i2 = cv2.imread("face_animation.jpg")
             self.i1 = cv2.imread("b2-1_haarcascades/face_animation.jpg")
 
@@ -77,22 +55,21 @@ class App(QMainWindow):
         else: 
             self.image = QImage(250,250)
         
-        # Central Widget
+        # Central Widget (Hauptbereich)
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
-        # Create the menu bar
+        # Menüleiste (Menüs und Aktionen)
         menu_bar = self.menuBar()
         view_menu = menu_bar.addMenu("Ansicht")
         self.fullscreen_action = QAction("Vollbild",self)
         self.fullscreen_action.triggered.connect(self.toggle_fullscreen)
         view_menu.addAction(self.fullscreen_action)
 
-        self.is_nightmode = False # Nachtmodus deaktiviert
+        self.is_nightmode = False # Nachtmodus (deaktiviert)
         self.nightmode_action = QAction("Nachtmodus",self)
         self.nightmode_action.triggered.connect(self.toggle_nightmode)
         view_menu.addAction(self.nightmode_action)
-
 
         help_menu = menu_bar.addMenu("Info")
         help_action = QAction("Kurzanleitung",self)
@@ -106,26 +83,26 @@ class App(QMainWindow):
         end_action.triggered.connect(self.close)
         help_menu.addAction(end_action)
 
-        # Main Layout
+        # Main Layout im Central Widget
         debug_layout = QVBoxLayout(self.central_widget)
         main_layout = QHBoxLayout()
-        debug_layout.addLayout(main_layout)
-        self.status = QStatusBar()
+        # Status Anzeigeleiste (unterhalb des Hauptbreichs)
+        debug_layout.addLayout(main_layout) 
+        self.status = QStatusBar() 
         debug_layout.addWidget(self.status)
         
         # Kamera- und Bildanzeigebereich
         self.image_display = QLabel("Anzeigebereich für Bilder/Kamera")
-        #self.image_display.setStyleSheet("background-color: #dcdcdc; border: 1px solid black;")
-        self.image_display.setProperty("status", "display")
-        self.image_display.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.image_display.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.image_display.setProperty("status", "display") # Property für Style aus Stylesheet
+        self.image_display.setAlignment(Qt.AlignmentFlag.AlignCenter) # Zentrierte Ausrichtung
+        self.image_display.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding) # Größe passt sich an Fenstergröße an
         self.image_display.setMinimumSize(300,300)
         main_layout.addWidget(self.image_display)
 
-        # Control Panel Layout
+        # Kontrollbereich Layout (rechts vom Bildanzeigebereich)
         control_panel = QVBoxLayout()
 
-        # Info Label - Beispielanimation Haar Cascades
+        # Beispielanimation Haar Cascades
         self.animation_label = QLabel()
         self.pixmap = QPixmap(self.image)
         self.pixmap = self.pixmap.scaled(250, 250)
@@ -135,7 +112,7 @@ class App(QMainWindow):
         self.animation_label.setPixmap(self.pixmap)
         self.animation_label.setMinimumWidth(250)
         self.animation_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        control_panel.addWidget(self.animation_label)
+        control_panel.addWidget(self.animation_label) # Animation zu Kontrollbereich hinzufügen
 
         # Kamera Dropdown Layout
         camera_layout = QHBoxLayout()
@@ -145,36 +122,36 @@ class App(QMainWindow):
         camera_layout.addWidget(self.camera_selector)
 
         self.btn_refresh_cameras = QPushButton("Kameras Aktualisieren")
-        self.btn_refresh_cameras.clicked.connect(self.refresh_camera_list)
+        self.btn_refresh_cameras.clicked.connect(self.refresh_camera_list) # Klick-Event für Button
         control_panel.addWidget(self.btn_refresh_cameras)
-        control_panel.addLayout(camera_layout)
+        control_panel.addLayout(camera_layout) # Kamera Dropdown zu Kontrollbereich hinzufügen
 
         # Modus Auswahl Layout
         mode_layout = QHBoxLayout()
         self.mode_selector = QComboBox()
         self.mode_selector.setEnabled(True)
         self.mode_selector.addItems(["live", "file"])
-        self.mode_selector.currentTextChanged.connect(self.change_mode)
+        self.mode_selector.currentTextChanged.connect(self.change_mode) # Event für Auswahländerung
         mode_layout.addWidget(QLabel("Modus:"))
         mode_layout.addWidget(self.mode_selector)
         #mode_layout.addWidget(QLabel(""))
-        control_panel.addLayout(mode_layout)
+        control_panel.addLayout(mode_layout) # Modus Auswahl Dropdown zu Kontrollbereich hinzufügen
 
         # Buttons Layout
-        buttons_layout = QVBoxLayout()
+        buttons_layout = QVBoxLayout() # Vertikales Layout für Buttons
 
         # Bild laden
         self.btn_load_image = QPushButton("Bild Laden")
         self.btn_load_image.setCheckable(True)
         self.btn_load_image.setEnabled(False)
         self.btn_load_image.clicked.connect(self.load_reset_file)
-        buttons_layout.addWidget(self.btn_load_image)
+        buttons_layout.addWidget(self.btn_load_image) # "Bild Laden" Button zu Kontrollbereich hinzufügen
 
         self.btn_start_camera = QPushButton("Live-Kamera Starten")
         self.btn_start_camera.setCheckable(True)
         self.btn_start_camera.setEnabled(False)
         self.btn_start_camera.clicked.connect(self.start_stop_camera)
-        buttons_layout.addWidget(self.btn_start_camera)
+        buttons_layout.addWidget(self.btn_start_camera) # "Live-Kamera Starten" Button zu Kontrollbereich hinzufügen
         
     
         classifier_layout = QHBoxLayout()
@@ -185,33 +162,35 @@ class App(QMainWindow):
         self.classifier_selector.currentTextChanged.connect(self.change_classifier)
         classifier_layout.addWidget(QLabel("Klassifizierer:"))
         classifier_layout.addWidget(self.classifier_selector)
-        buttons_layout.addLayout(classifier_layout)
+        buttons_layout.addLayout(classifier_layout) # Klassifizierer Dropdown zu Kontrollbereich hinzufügen
 
-        slider_layout = QVBoxLayout()
+        slider_layout = QVBoxLayout() # Vertikales Layout für Slider
 
         # scaleFactor Slider
-        scaleFactor_layout = QHBoxLayout()
+        scaleFactor_layout = QHBoxLayout() # Horizontales Layout für Label und Slider
         self.label_custom_scaleFactor = QLabel("scaleFactor:")
         self.slider_custom_scaleFactor = QSlider(Qt.Orientation.Horizontal)
+        self.slider_custom_scaleFactor.setMinimumWidth(150)
         self.slider_custom_scaleFactor.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.slider_custom_scaleFactor.setRange(10, 30)  # Range from 1.0 to 3.0 (multiplied by 10)
-        self.slider_custom_scaleFactor.setValue(1.05)  # Default value 1.2
+        self.slider_custom_scaleFactor.setRange(10, 30)  # 1.0 bis 3.0 (multipliziert mal 10)
+        self.slider_custom_scaleFactor.setValue(1.05)  # Default 1.2
         self.label_custom_scaleFactor.setText(f"scaleFactor: {self.slider_custom_scaleFactor.value()/10}")
         self.slider_custom_scaleFactor.valueChanged.connect(self.update_scaleFactor)
-        self.slider_custom_scaleFactor.setSingleStep(1)
+        self.slider_custom_scaleFactor.setSingleStep(1) # Schrittweite 0.1
         self.slider_custom_scaleFactor.setEnabled(False)
         
-        scaleFactor_layout.addWidget(self.label_custom_scaleFactor)
+        scaleFactor_layout.addWidget(self.label_custom_scaleFactor) 
         scaleFactor_layout.addWidget(self.slider_custom_scaleFactor)
-        slider_layout.addLayout(scaleFactor_layout)
+        slider_layout.addLayout(scaleFactor_layout) 
 
         # minNeighbors Slider
-        minNeighbors_layout = QHBoxLayout()
+        minNeighbors_layout = QHBoxLayout() # Horizontales Layout für Label und Slider
         self.label_custom_minNeighbors = QLabel("minNeighbors:")
         self.slider_custom_minNeighbors = QSlider(Qt.Orientation.Horizontal)
+        self.slider_custom_minNeighbors.setMinimumWidth(150)
         self.slider_custom_minNeighbors.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.slider_custom_minNeighbors.setRange(1, 20)  # Range from 1 to 10
-        self.slider_custom_minNeighbors.setValue(3)  # Default value 3
+        self.slider_custom_minNeighbors.setRange(1, 20)  # von 1 bis 10
+        self.slider_custom_minNeighbors.setValue(3)  # Default 3
         self.label_custom_minNeighbors.setText(f"minNeighbors: {self.slider_custom_minNeighbors.value()}")
         self.slider_custom_minNeighbors.valueChanged.connect(self.update_minNeighbors)
         self.slider_custom_minNeighbors.setSingleStep(1)
@@ -221,12 +200,13 @@ class App(QMainWindow):
         slider_layout.addLayout(minNeighbors_layout)
 
         # minSize Slider
-        minSize_layout = QHBoxLayout()
+        minSize_layout = QHBoxLayout() # Horizontales Layout für Label und Slider
         self.label_custom_minSize = QLabel("minSize:")
         self.slider_custom_minSize = QSlider(Qt.Orientation.Horizontal)
+        self.slider_custom_minSize.setMinimumWidth(150)
         self.slider_custom_minSize.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed) 
-        self.slider_custom_minSize.setRange(20, 200)  # Range from 20 to 200 pixels
-        self.slider_custom_minSize.setValue(30)  # Default value 30 pixels
+        self.slider_custom_minSize.setRange(20, 200)  # von 20 bis 200
+        self.slider_custom_minSize.setValue(30)  # Default 30
         self.label_custom_minSize.setText(f"minSize: {self.slider_custom_minSize.value()}")
         self.slider_custom_minSize.valueChanged.connect(self.update_minSize)
         self.slider_custom_minSize.setSingleStep(5)
@@ -235,12 +215,13 @@ class App(QMainWindow):
         minSize_layout.addWidget(self.slider_custom_minSize)
         slider_layout.addLayout(minSize_layout)
 
-        buttons_layout.addLayout(slider_layout)
+        buttons_layout.addLayout(slider_layout) # Slider Layout zu Kontrollbereich hinzufügen
 
         # Label zur Anzeige des Namens der benutzerdefinierten Klassifizierer-XML-Datei
         self.custom_classifier_label = QLabel("")
         buttons_layout.addWidget(self.custom_classifier_label)
 
+        # Buttons für Klassifizierer
         self.btn_choose_classifier = QPushButton("Eigener Klassifizierer Laden")
         self.btn_choose_classifier.setEnabled(False)
         self.btn_choose_classifier.clicked.connect(self.load_custom_classifier)
@@ -255,26 +236,26 @@ class App(QMainWindow):
         self.btn_screenshot.setEnabled(False)
         self.btn_screenshot.clicked.connect(self.save_screenshot)
         buttons_layout.addWidget(self.btn_screenshot)
-        control_panel.addLayout(buttons_layout)
+        control_panel.addLayout(buttons_layout) # Button Layout zu Kontrollbereich hinzufügen
 
-        # Erkannte Objekte Label
+        # Erkannte Objekte Label (Anzeige der Anzahl der erkannten Objekte)
         objects_layout = QHBoxLayout()
         self.num_objects = 0 # Anzahl der erkannten Objekte
         self.object_count_label = QLabel("")
-        self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
+        self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>") 
         self.object_count_label.setOpenExternalLinks(True)
-        self.object_count_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.object_count_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        self.object_count_label.setStyleSheet("font-weight: bold;")
+        self.object_count_label.setAlignment(Qt.AlignmentFlag.AlignLeft) # Ausrichtung links
+        self.object_count_label.setAlignment(Qt.AlignmentFlag.AlignVCenter) # Vertikale Zentrierung
+        self.object_count_label.setStyleSheet("font-weight: bold;") 
         objects_layout.addWidget(QLabel("Erkannte Objekte: "))
         objects_layout.addWidget(self.object_count_label)
         control_panel.addLayout(objects_layout)
 
-        main_layout.addLayout(control_panel)
+        main_layout.addLayout(control_panel) # Kontrollbereich zu Hauptlayout hinzufügen
 
         # Timer für die Aktualisierung der Frames
         self.timer = QTimer()
-        self.timer.timeout.connect(self.update_frame)
+        self.timer.timeout.connect(self.update_frame) 
 
         # Timer für Beispielanimation
         self.animation_timer = QTimer(self)
@@ -282,16 +263,19 @@ class App(QMainWindow):
         self.animation_timer.start(50)  # Animationsgeschwindigkeit in ms
 
         # Variablen
-        self.current_frame = None
-        self.static_image = None
+        self.current_frame = None # Aktueller Frame
+        self.static_image = None # Statisches Bild
 
         # Kameraliste bei Programmstart aktualisieren
-        self.btn_refresh_cameras.click()
-        self.change_mode(self.mode_selector.currentText())
+        self.btn_refresh_cameras.click() # Simuliert Klick des Kameras aktualisieren Buttons
+        self.change_mode(self.mode_selector.currentText()) # Modus basierend auf Auswahl initialisieren
 
     # Animiert die Haar Cascade Features
     def animation(self):
-        
+        """
+        Beispielanimation von Haar Cascade Features.
+        Sinnvoll um Response des GUI zu testen und lag zu erkennen
+        """
         if self.x + 60 >= 250:
             self.x = 0
             self.y += 60
@@ -305,13 +289,14 @@ class App(QMainWindow):
         self.draw_haar_filter()
         pass
 
-    # Zeichnet Haar Cascade Features
+    # Zeichnet Haar Cascade Features als Overlay auf das Bild.
     def draw_haar_filter(self):
 
-        overlay_pixmap = self.pixmap.copy()
-        painter = QPainter(overlay_pixmap)
-        x, y = self.x, self.y
+        overlay_pixmap = self.pixmap.copy() # Kopie des Originalbildes
+        painter = QPainter(overlay_pixmap) # Painter-Objekt für Overlay
+        x, y = self.x, self.y # Position des Haar Cascade Features
 
+        # Zufällige Auswahl eines Haar Cascade Features
         if self.random_int == 0:
             painter.fillRect(QRect(x,      y, 20, 60), QColor("white"))
             painter.fillRect(QRect(x + 20, y, 20, 60), QColor("black"))
@@ -342,7 +327,7 @@ class App(QMainWindow):
             painter.fillRect(QRect(x + 30, y + 30, 30, 30), QColor("black"))
 
         painter.end()
-        self.animation_label.setPixmap(overlay_pixmap)
+        self.animation_label.setPixmap(overlay_pixmap) # Overlay-Bild setzen
 
     # Schaltet zwischen Vollbildmodus und Fenstermodus um.
     def toggle_fullscreen(self):
@@ -358,35 +343,52 @@ class App(QMainWindow):
     def toggle_nightmode(self):
         # Versuche Stylesheet zu laden
         if self.is_nightmode:
-            try:    
-                self.load_stylesheet("style_sheet.css")
-                self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
+            try:
+                try:
+                    self.load_stylesheet("style_sheet.css") # Um Fehlermeldung zu vermeiden
+                except:
+                    pass
+                try:
+                    self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
+                except:
+                    pass    
             # Fehlerbehandlung beim Laden des Stylesheets
             except: 
                 print("Fehler beim Laden des Stylesheets, stelle sicher das du im richtigen Verzeichnis ../b2-1_haarcascades/main.py startest")
             self.nightmode_action.setText("Nachtmodus")
         else:
-            try:    
-                self.load_stylesheet("night_mode.css")
-                self.load_stylesheet("b2-1_haarcascades/night_mode.css")
+            try:  
+                try:
+                    self.load_stylesheet("night_mode.css") # Um Fehlermeldung zu vermeiden
+                except:
+                    pass
+                try:
+                    self.load_stylesheet("b2-1_haarcascades/night_mode.css")
+                except:
+                    pass                      
             # Fehlerbehandlung beim Laden des Stylesheets
             except: 
                 print("Fehler beim Laden des Stylesheets, stelle sicher das du im richtigen Verzeichnis ../b2-1_haarcascades/main.py startest")
             self.nightmode_action.setText("Tagmodus")
-        # Update the night mode state
-        self.is_nightmode = not self.is_nightmode   
+        
+        self.is_nightmode = not self.is_nightmode  # Nachtmodus-Status umschalten 
         pass
     
+    # Zeigt ein Dialogfeld mit einer Kurzanleitung an (erreichbar über Menü->Info->Kurzanleitung)
     def show_help(self):
         QMessageBox.about(self, "Kurzanleitung",  "Kamera und Modus auswählen und auf Live-Kamera Starten klicken.\n\nAlternativ Modus auf 'file' setzen und Bild Laden.\n\nObjekte werden automatisch erkannt, markiert und gezählt.\n\nVortrainierte als auch eigene Klassifizierer können geladen werden.\n\nDazu einfach den entsprechenden Button klicken und die XML-Datei auswählen.\n\nViel Spaß!")
-
+    
+    # Zeigt ein Dialogfeld mit Informationen über die Anwendung an (erreichbar über Menü->Info->Über)
     def show_about(self):
         QMessageBox.about(self, "Über", "Anwendung zur Objekterkennung mit Haarcascades\n\nProgrammiert von der Projektgruppe B2-1 im Master AKI an der FH SWF Iserlohn\n\nYannic\nEmelie\nLeon\nPhilipp\n\nJanuar 2025")
 
     # Lädt ein Stylesheet aus einer Datei.
-    # Parameters: filename (str): Dateiname des Stylesheets.
     def load_stylesheet(self, filename):
+        """
+        Lädt ein Stylesheet aus einer Datei und wendet es auf die Anwendung an.
 
+        Parameter: filename (str): Dateiname des Stylesheets.
+        """
         try:
             with open(filename, "r") as file:
                 self.setStyleSheet(file.read())
@@ -395,7 +397,11 @@ class App(QMainWindow):
 
     # Ändert den Modus basierend auf der Auswahl im Dropdown-Menü.
     def change_mode(self, text):
-        
+        """
+        Ändert den Anzeige-Modus basierend auf der Auswahl im Dropdown-Menü.
+
+        Parameter: text (str): Text des ausgewählten Modus.
+        """
         if text == "live":
             self.btn_start_camera.setEnabled(True)
             self.btn_start_camera.setProperty("status","start")
@@ -419,7 +425,13 @@ class App(QMainWindow):
             self.btn_load_image.setEnabled(False)
         pass
     
+    # Ändert den Klassifizierer basierend auf der Auswahl im Dropdown-Menü.
     def change_classifier(self, text):
+        """
+        Ändern des Klassifizierers basierend auf der Auswahl im Dropdown-Menü.
+
+        Parameter: text (str): Text des ausgewählten Klassifizierers.
+        """
         self.btn_choose_classifier.setEnabled(False)
         self.slider_custom_scaleFactor.setEnabled(False)
         self.slider_custom_minNeighbors.setEnabled(False)
@@ -448,7 +460,13 @@ class App(QMainWindow):
             self.classifier_manager.load_classifier("face")
         pass
 
+    # Lädt vordefinierte Klassifizierer mit den entsprechenden Parametern.
     def load_predefined_classifier(self, classifier_id):
+        """
+        Lädt einen vordefinierten Klassifizierer basierend auf der Klassifizierer ID.
+
+        Parameter: classifier_id (str): ID des Klassifizierers (z. B. "face", "eye", "smile").
+        """
         self.classifier_manager.load_classifier(classifier_id)
         self.slider_custom_scaleFactor.blockSignals(True)
         self.slider_custom_minNeighbors.blockSignals(True)
@@ -464,6 +482,7 @@ class App(QMainWindow):
         self.slider_custom_minSize.blockSignals(False)
         pass
 
+    # Lädt benutzerdefinierten Klassifizierer aus einer Datei.
     def load_custom_classifier(self):
         classifier_name = self.classifier_manager.load_custom_classifier()
         self.custom_classifier_label.setText(classifier_name)
@@ -471,7 +490,9 @@ class App(QMainWindow):
 
     # Aktualisiert die Liste der verfügbaren Kameras.
     def refresh_camera_list(self):
-        
+        """
+        Aktualisiert die Liste der verfügbaren Kameras.
+        """
         available_cameras = self.camera_manager.detect_cameras()
         self.camera_selector.clear()
         if available_cameras:
@@ -480,21 +501,23 @@ class App(QMainWindow):
             self.status.showMessage(f"Kameras gefunden: {camera_names}")
             self.btn_start_camera.setEnabled(True)
             self.btn_start_camera.setProperty("status","start")
-            self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
-            self.btn_start_camera.style().polish(self.btn_start_camera)    # Reapply style
+            self.btn_start_camera.style().unpolish(self.btn_start_camera) # Zurücksetzen des Styles 
+            self.btn_start_camera.style().polish(self.btn_start_camera) # Neuanwenden des Styles
         else:
             self.camera_selector.addItem("Keine Kamera erkannt")
             self.status.showMessage("Keine Kameras gefunden.")
             self.btn_start_camera.setEnabled(False) # Bug: setEnable ändert Button-Style nicht automatisch"
-            self.btn_start_camera.setProperty("status", "unavailable")
-            self.btn_start_camera.style().unpolish(self.btn_start_camera)
-            self.btn_start_camera.style().polish(self.btn_start_camera)
+            self.btn_start_camera.setProperty("status", "unavailable") # Ändert Style des Buttons durch Property (Style Sheet)
+            self.btn_start_camera.style().unpolish(self.btn_start_camera) # Zurücksetzen des Styles 
+            self.btn_start_camera.style().polish(self.btn_start_camera) # Neuanwenden des Styles
             
         pass
 
     # Startet die Kamera.   
     def start_camera(self):
-        
+        """
+        Startet die Kamera basierend auf dem ausgewählten Kamera-Index.
+        """
         camera_index = self.camera_selector.currentIndex()  # Kamera-Index auswählen
         try:
             self.btn_refresh_cameras.setEnabled(False)
@@ -516,69 +539,78 @@ class App(QMainWindow):
     
     # Stoppt die Kamera.
     def stop_camera(self):
-
+        """
+        Stoppt die Kamera und gibt Ressourcen frei.
+        """
         self.btn_refresh_cameras.setEnabled(True)
         self.camera_selector.setEnabled(True)
         self.mode_selector.setEnabled(True)
         self.classifier_selector.setEnabled(True)
-        self.btn_start_camera.setProperty("status","start")
-        self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
-        self.btn_start_camera.style().polish(self.btn_start_camera)    # Reapply style
+        self.btn_start_camera.setProperty("status","start") # Setzt Property für Style zurück
+        self.btn_start_camera.style().unpolish(self.btn_start_camera) # Zurücksetzen des Styles 
+        self.btn_start_camera.style().polish(self.btn_start_camera) # Neuanwenden des Styles
         self.btn_start_camera.setText("Live-Kamera Starten")
-        self.status.showMessage("Kamera wird gestoppt...")
-        self.camera_manager.stop_camera()
-        self.timer.stop()
+        self.status.showMessage("Kamera wird gestoppt...") # Statusnachricht in Statusleiste
+        self.camera_manager.stop_camera() # Kamera stoppen aus CameraManager ausführen
+        self.timer.stop() # Timer stoppen(keine Frames mehr aktualisieren)
         self.num_objects = 0 # Anzahl der erkannten Objekte auf 0 zurücksetzen
         self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
 
-        self.image_display.clear()  # Clear the pixmap from the label
+        self.image_display.clear()  # Bildanzeige leeren
         self.image_display.setText("Anzeigebereich für Bilder/Kamera")  # Optionale Standardnachricht
-        self.status.showMessage("Kamera gestoppt.")
+        self.status.showMessage("Kamera gestoppt.") # Statusnachricht in Statusleiste
         pass
 
 
     # Startet oder stoppt die Kamera, je nach Status des Buttons.
     def start_stop_camera(self,checked):
+        """
+        Startet oder stoppt die Kamera basierend auf dem Status des Buttons.
 
-        #self.btn_start_camera.isChecked():
+        Parameter: checked (bool): Status des Buttons (True = Start, False = Stop).
+        """
         if checked:                 
             self.start_camera()
-            print("Kamera gestartet")
+            print("Kamera gestartet") # Debug-Ausgabe in Konsole
         else:
             self.stop_camera()
-            print("Kamera gestartet")
+            print("Kamera gestartet") # Debug-Ausgabe in Konsole
         pass
 
-    
     # Lädt ein Bild aus einer Datei.
     def load_image_from_file(self):
-       
+        """
+        Läd ein Bild aus einer Datei und zeigt es in der GUI an. (Dateiauswahl über System-Dialog)
+        """
         try:
             self.btn_refresh_cameras.setEnabled(False)
             self.camera_selector.setEnabled(False)
             self.mode_selector.setEnabled(False)
             self.classifier_selector.setEnabled(False)
-            self.btn_load_image.setProperty("status","stop")
-            self.btn_load_image.style().unpolish(self.btn_load_image)  # Reset style
-            self.btn_load_image.style().polish(self.btn_load_image)    # Reapply style
+            self.btn_load_image.setProperty("status","stop") # Setzt Property für Style zurück
+            self.btn_load_image.style().unpolish(self.btn_load_image) # Zurücksetzen des Styles
+            self.btn_load_image.style().polish(self.btn_load_image) # Neuanwenden des Styles 
             self.btn_load_image.setText("Bild Reset")
-            self.status.showMessage("Bild wird geladen...")
-            file_path = self.file_manager.open_file_picture()
+            self.status.showMessage("Bild wird geladen...") # Statusnachricht in Statusleiste
+            file_path = self.file_manager.open_file_picture() # Aufruf der Methode zum Öffnen einer Datei aus dem FileManager
             if file_path:
-                self.static_image = self.file_manager.load_image(file_path)
+                self.static_image = self.file_manager.load_image(file_path) # Aufruf der Methode zum Laden eines Bildes aus dem FileManager
                 self.static_image = cv2.cvtColor(self.static_image, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, Umwandlung in RGB
                 self.btn_start_camera.setEnabled(False)
-                self.timer.start(50)
-                self.status.showMessage(f"Bild {file_path} erfolgreich geladen.")
-                print(f"Bild {file_path} erfolgreich geladen.")    
+                self.timer.start(50) # Update alle 50 ms
+                self.status.showMessage(f"Bild {file_path} erfolgreich geladen.") # Statusnachricht in Statusleiste
+                print(f"Bild {file_path} erfolgreich geladen.") # Debug-Ausgabe in Konsole
 
-        except Exception as e:
+        except Exception as e: # Fehlerbehandlung
             self.status.showMessage(f"Fehler beim Laden des Bildes: {str(e)}")
             print(f"Fehler beim Laden des Bildes: {str(e)}")
         pass
 
     # Setzt das Bild zurück.
     def reset_image(self):
+        """
+        Setzt das Bild zurück und löscht es aus der Anzeige.
+        """
         try:
             self.btn_refresh_cameras.setEnabled(True)
             self.camera_selector.setEnabled(True)
@@ -586,28 +618,30 @@ class App(QMainWindow):
             self.mode_selector.setEnabled(True)
 
             self.btn_load_image.setProperty("status","start")
-            self.btn_load_image.style().unpolish(self.btn_load_image)  # Reset style
-            self.btn_load_image.style().polish(self.btn_load_image)    # Reapply style
+            self.btn_load_image.style().unpolish(self.btn_load_image)  
+            self.btn_load_image.style().polish(self.btn_load_image)   
             self.btn_load_image.setText("Bild Laden")
             self.status.showMessage("Bild wird zurückgesetzt...")
-            self.static_image = None
-            self.timer.stop()
-            self.image_display.clear()
+            self.static_image = None # Bild löschen
+            self.timer.stop() # Timer stoppen (keine Frames mehr aktualisieren)
+            self.image_display.clear() # Bildanzeige leeren
             self.image_display.setText("Anzeigebereich für Bilder/Kamera")
-            self.num_objects = 0
+            self.num_objects = 0 # Anzahl der erkannten Objekte auf 0 zurücksetzen
             self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
-            self.status.showMessage("Bild zurückgesetzt.")
-            print("Bild zurückgesetzt.")
-        except Exception as e:
+            self.status.showMessage("Bild zurückgesetzt.") # Statusnachricht in Statusleiste 
+            print("Bild zurückgesetzt.") # Debug-Ausgabe in Konsole
+        except Exception as e: # Fehlerbehandlung
             self.status.showMessage(f"Fehler beim Zurücksetzen des Bildes: {str(e)}")
             print(f"Fehler beim Zurücksetzen des Bildes: {str(e)}")
         pass
 
-        
-
     # Lädt ein Bild aus einer Datei und setzt den Button zurück.
     def load_reset_file(self, checked):
+        """
+        Läd ein Bild aus einer Datei und setzt den Button zurück.
 
+        Parameter: checked (bool): Status des Buttons (True = Laden, False = Zurücksetzen).
+        """
         if checked:
             self.load_image_from_file()
             print("Bild laden...")
@@ -618,9 +652,12 @@ class App(QMainWindow):
 
     # Erstellt einen Screenshot des aktuellen Frames.
     def save_screenshot(self):
+        """
+        Speichert einen Screenshot des aktuellen Frames.
+        """
         self.status.showMessage("Screenshot wird gespeichert...")
         
-        if self.file_manager.save_screenshot(self.current_frame):
+        if self.file_manager.save_screenshot(self.current_frame): # Aufruf der Methode zum Speichern eines Screenshots aus dem FileManager
             self.status.showMessage("Screenshot erfolgreich gespeichert.")
         else:
             self.status.showMessage("Fehler: Screenshot konnte nicht gespeichert werden.")
@@ -646,8 +683,11 @@ class App(QMainWindow):
 
     # Holt ein Frame von der Kamera und zeigt es in der GUI an. 
     def update_frame(self):
-        if self.mode_selector.currentText() == "live":
-            frame, ret = self.camera_manager.get_frame()
+        """
+        Lädt den aktuellen Frame, erkennt Objekte und zeigt sie in der GUI an.
+        """
+        if self.mode_selector.currentText() == "live": # Abfrage des aktuellen Modus, wenn Modus "live", dann
+            frame, ret = self.camera_manager.get_frame() # Frame von Kamera holen mit Aufruf aus CameraManager
             if not ret: # Wenn Kamera keine Frames mehr liefert/disconnected, stoppe Kamera und aktualisiere Kamera-Liste
                 self.stop_camera()
                 self.refresh_camera_list()
@@ -658,7 +698,7 @@ class App(QMainWindow):
             self.current_frame = frame
 
             # Objekterkennung
-            objects = self.classifier_manager.detect_faces(frame, self.classifier_manager.current_classifier)
+            objects = self.classifier_manager.detect_faces(frame, self.classifier_manager.current_classifier) # Aufruf der Methode zur Objekterkennung aus dem ClassifierManager
             self.num_objects = len(objects) # Anzahl der erkannten Objekte
             self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
                 
@@ -666,7 +706,7 @@ class App(QMainWindow):
             for (x, y, w, h) in objects:
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
             
-
+            # Anzeige des Frames im Anzeigebereich
             height, width, channel = frame.shape # Größe des Frames
             aspect_ratio = height/width # Seitenverhältnis
             bytes_per_line = 3 * width  # 3 Kanäle pro Pixel (RGB)
@@ -685,10 +725,9 @@ class App(QMainWindow):
             scaled_pixmap = pixmap.scaled(i_w,i_h) 
             self.image_display.setPixmap(scaled_pixmap) # Setze Pixmap in QLabel(image_display)
             
-
-        elif self.mode_selector.currentText() == "file":
+        elif self.mode_selector.currentText() == "file": # Abfrage des aktuellen Modus, wenn Modus "live", 
             
-            frame = self.static_image
+            frame = self.static_image 
             self.current_frame = frame
 
             # Objekterkennung
@@ -733,3 +772,5 @@ class App(QMainWindow):
             cv2.rectangle(self.current_frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
 
         pass
+
+
