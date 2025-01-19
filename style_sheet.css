@@ -1,5 +1,5 @@
 QMainWindow {
-    font-family: 'Segoe UI'; 
+    font-family: 'Segoe UI'; /* Schriftart */
     font-size: 14px;
     background-color: white;
 }
@@ -17,7 +17,7 @@ QLabel[status="display"] {
     font-size: 14px;
     color: black;
     background-color: #dcdcdc; /* Helles Grau, fast weiss */ 
-    border: 1px solid black;
+    border: 1px solid black; /* Schwarzer Rand */
 }
 
 /* Buttons */
@@ -26,8 +26,8 @@ QPushButton {
     font-size: 14px;
     background-color: #0078D7; /* Microsoft Blue */
     color: white;
-    border-radius: 5px;
-    padding: 5px;
+    border-radius: 5px; /* Rundung der Ecken 5px */
+    padding: 5px; /* Abstand zwischen Text und Rahmen 5px */
 }
 
 QPushButton:hover {
@@ -66,7 +66,7 @@ QMenuBar {
 }
 QMenuBar::item {
     color: black;
-    padding: 5px 10px;
+    padding: 5px 10px; /* Abstand zwischen Text und Rand */
     background: transparent;
 }
 QMenuBar::item:selected {
