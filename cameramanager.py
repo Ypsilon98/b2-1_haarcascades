@@ -10,7 +10,7 @@ class CameraManager:
         """        
         try:
             self.cap = None # Kamera-Objekt
-        except:
+        except Exception as e: # Fehlerbehandlung
             print("Fehler beim Initialalisiern des Kamera-Managers")
     
     
@@ -29,7 +29,7 @@ class CameraManager:
                     self.cap.release()
             return available_cameras
         
-        except:
+        except Exception as e: # Fehlerbehandlung
             print("Fehler beim Erkennen der Kameras")
             return None
 
@@ -49,7 +49,7 @@ class CameraManager:
                 print (f"Fehler: Kamera mit ID {camera_id} konnte nicht geöffnet werden")
                 return None
             
-        except:
+        except Exception as e: # Fehlerbehandlung
             print("Fehler beim Öffnen der Kamera")
             return None
         
@@ -65,7 +65,7 @@ class CameraManager:
                 self.cap.release()
                 print("Kamera erfolgreich geschlossen")
 
-        except:
+        except Exception as e: # Fehlerbehandlung
             print("Fehler beim Schließen der Kamera")
 
 
@@ -81,7 +81,7 @@ class CameraManager:
                     return frame, True
                 else:
                     return None, False
-        except:
+        except Exception as e: # Fehlerbehandlung
             print("Fehler beim Abrufen des Frames")
             return None, False
     

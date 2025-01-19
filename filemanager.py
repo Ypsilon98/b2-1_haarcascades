@@ -20,7 +20,7 @@ class FileManager:
         try:        
             self.filetypes_pictures = [("Bilder", "*.jpg *.png *.jpeg"), ("Alle Dateien", "*.*")]
             self.filetypes_classifier = [("XML-Dateien", "*.xml"), ("Alle Dateien", "*.*")]
-        except:
+        except Exception as e: # Fehlerbehandlung
             print("Fehler beim Initialisieren des Datei-Managers")
 
 
@@ -70,7 +70,7 @@ class FileManager:
             else:
                 print("Keine Datei ausgewählt.")
                 return None
-        except:
+        except Exception as e: # Fehlerbehandlung
             print("Fehler beim Öffnen der Datei")
             return None
             
@@ -98,7 +98,7 @@ class FileManager:
             else:
                 print(f"Bild erfolgreich geladen: {file_path}")
             return image
-        except:
+        except Exception as e: # Fehlerbehandlung
             print("Fehler beim Laden des Bildes")
             return None
            
@@ -130,6 +130,6 @@ class FileManager:
             else:
                 print(f"Fehler: Bild konnte nicht gespeichert werden.")
                 return False
-        except:
+        except Exception as e: # Fehlerbehandlung
             print("Fehler beim Speichern des Bildes")
             return False

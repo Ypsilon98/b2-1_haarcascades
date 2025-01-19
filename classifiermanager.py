@@ -77,7 +77,7 @@ class ClassifierManager:
 
         try:
             self.classifiers["custom"]["scaleFactor"] = value
-        except:
+        except Exception as e: # Fehlerbehandlung
             print("Fehler beim Aktualisieren des scaleFactor")
     
     # Aktualisiert die Parameter des benutzerdefinierten Klassifizierers.
@@ -90,7 +90,7 @@ class ClassifierManager:
 
         try:
             self.classifiers["custom"]["minNeighbors"] = value
-        except:
+        except Exception as e: # Fehlerbehandlung
             print("Fehler beim Aktualisieren des minNeighbors")
      
     # Aktualisiert die Parameter des benutzerdefinierten Klassifizierers.
@@ -103,7 +103,7 @@ class ClassifierManager:
 
         try:
             self.classifiers["custom"]["minSize"] = (value, value)
-        except:
+        except Exception as e: # Fehlerbehandlung
             print("Fehler beim Aktualisieren des minSize")
 
     # Lädt eine Haar-Cascade XML-Datei zum Erkennen von Gesichtern.
@@ -125,7 +125,7 @@ class ClassifierManager:
                     return "Datei auswählen..."
 
             return self.custom_classifier_name
-        except:
+        except Exception as e: # Fehlerbehandlung
             print("Fehler beim Laden des benutzerdefinierten Klassifizierers")
             return "Fehler beim Laden"
     

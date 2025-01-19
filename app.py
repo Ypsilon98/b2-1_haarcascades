@@ -84,7 +84,7 @@ class App(QMainWindow):
             self.i1 = cv2.imread("b2-1_haarcascades/face_animation.jpg")
 
         # Fehlerbehandlung beim Laden des Stylesheets
-        except: 
+        except Exception as e: # Fehlerbehandlung 
             print("Fehler beim Laden des Stylesheets, stelle sicher das du im richtigen Verzeichnis ../b2-1_haarcascades/main.py startest")
         
         # Sicherstellen, dass App nicht abstürzt, wenn Bild nicht geladen werden kann
@@ -330,7 +330,7 @@ class App(QMainWindow):
             self.draw_haar_filter()
         except Exception as e:
             print(f"Fehler beim Erstellen der Animation: {str(e)}") # Debug-Ausgabe in Konsole    
-            pass
+            
 
     # Zeichnet Haar Cascade Features als Overlay auf das Bild.
     def draw_haar_filter(self):
@@ -373,7 +373,7 @@ class App(QMainWindow):
             self.animation_label.setPixmap(overlay_pixmap) # Overlay-Bild setzen
         except Exception as e:
             print(f"Fehler beim Anzeigen der Haar-Features: {str(e)}") # Debug-Ausgabe in Konsole
-            pass
+            
 
     # Schaltet zwischen Vollbildmodus und Fenstermodus um.
     def toggle_fullscreen(self):
@@ -386,7 +386,7 @@ class App(QMainWindow):
                 self.fullscreen_action.setText("Fenstermodus")
         except Exception as e:
             print(f"Fehler beim Umschalten des Vollbildmodus: {str(e)}") # Debug-Ausgabe in Konsole
-            pass
+            
     
     # Schaltet zwischen Nachtmodus und Tagmodus (stylesheets) um.
     def toggle_nightmode(self):
@@ -397,7 +397,7 @@ class App(QMainWindow):
                     self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
                     self.status.showMessage("Nachtmodus deaktiviert.")
             # Fehlerbehandlung beim Laden des Stylesheets
-            except: 
+            except Exception as e: # Fehlerbehandlung 
                 print("Fehler beim Laden des Stylesheets, stelle sicher das du im richtigen Verzeichnis ../b2-1_haarcascades/main.py startest")
             self.nightmode_action.setText("Nachtmodus")
         else:
@@ -406,12 +406,12 @@ class App(QMainWindow):
                     self.load_stylesheet("b2-1_haarcascades/night_mode.css")
                     self.status.showMessage("Nachtmodus aktiviert.")               
             # Fehlerbehandlung beim Laden des Stylesheets
-            except: 
+            except Exception as e: # Fehlerbehandlung 
                 print("Fehler beim Laden des Stylesheets, stelle sicher das du im richtigen Verzeichnis ../b2-1_haarcascades/main.py startest")
             self.nightmode_action.setText("Tagmodus")
         
         self.is_nightmode = not self.is_nightmode  # Nachtmodus-Status umschalten 
-        pass
+        
     
     # Zeigt ein Dialogfeld mit einer Kurzanleitung an (erreichbar über Menü->Info->Kurzanleitung)
     def show_help(self):
@@ -468,7 +468,7 @@ class App(QMainWindow):
         except Exception as e:
             print(f"Fehler beim Ändern des Modus: {str(e)}") # Debug-Ausgabe in Konsole
             self.status.showMessage(f"Fehler beim Ändern des Modus: {str(e)}") # Statusnachricht in Statusleiste
-        pass
+        
     
     # Ändert den Klassifizierer basierend auf der Auswahl im Dropdown-Menü.
     def change_classifier(self, text):
@@ -507,7 +507,7 @@ class App(QMainWindow):
         except Exception as e:
             print(f"Fehler beim Ändern des Klassifizierers: {str(e)}") # Debug-Ausgabe in Konsole
             self.status.showMessage(f"Fehler beim Ändern des Klassifizierers: {str(e)}") # Statusnachricht in Statusleiste
-            pass
+            
 
     # Lädt vordefinierte Klassifizierer mit den entsprechenden Parametern.
     def load_predefined_classifier(self, classifier_id):
@@ -534,7 +534,7 @@ class App(QMainWindow):
         except Exception as e:
             print(f"Fehler beim Laden des vordefinierten Klassifizierers: {str(e)}") # Debug-Ausgabe in Konsole
             self.status.showMessage(f"Fehler beim Laden des vordefinierten Klassifizierers: {str(e)}") # Statusnachricht in Statusleiste
-            pass
+            
 
     # Lädt benutzerdefinierten Klassifizierer aus einer Datei.
     def load_custom_classifier(self):
@@ -545,7 +545,7 @@ class App(QMainWindow):
         except Exception as e:
             print(f"Fehler beim Laden des benutzerdefinierten Klassifizierers: {str(e)}") # Debug-Ausgabe in Konsole
             self.status.showMessage(f"Fehler beim Laden des benutzerdefinierten Klassifizierers: {str(e)}") # Statusnachricht in Statusleiste
-            pass
+            
 
     # Aktualisiert die Liste der verfügbaren Kameras.
     def refresh_camera_list(self):
@@ -572,7 +572,7 @@ class App(QMainWindow):
                 self.btn_start_camera.style().polish(self.btn_start_camera) # Neuanwenden des Styles
         except Exception as e:
             print(f"Fehler beim Aktualisieren der Kamera-Liste: {str(e)}") # Debug-Ausgabe in Konsole
-            pass    
+            
 
     # Startet die Kamera.   
     def start_camera(self):
@@ -597,7 +597,7 @@ class App(QMainWindow):
             self.animation_label.setText(f"Kamera konnte nicht gestartet werden: {str(e)}") 
             self.status.showMessage(f"Kamera-Fehler: {str(e)}")
             print(f"Kamera konnte nicht gestartet werden: {str(e)}") # Debug-Ausgabe in Konsole
-        pass
+        
     
     # Stoppt die Kamera.
     def stop_camera(self):
@@ -624,7 +624,7 @@ class App(QMainWindow):
             self.status.showMessage("Kamera gestoppt.") # Statusnachricht in Statusleiste
         except Exception as e: # Fehlerbehandlung
             print(f"Fehler beim Stoppen der Kamera: {str(e)}") # Debug-Ausgabe in Konsole
-            pass
+            
 
 
     # Startet oder stoppt die Kamera, je nach Status des Buttons.
@@ -640,7 +640,7 @@ class App(QMainWindow):
         else:
             self.stop_camera()
             print("Kamera gestartet") # Debug-Ausgabe in Konsole
-        pass
+        
 
     # Lädt ein Bild aus einer Datei.
     def load_image_from_file(self):
@@ -669,7 +669,7 @@ class App(QMainWindow):
         except Exception as e: # Fehlerbehandlung
             self.status.showMessage(f"Fehler beim Laden des Bildes: {str(e)}")
             print(f"Fehler beim Laden des Bildes: {str(e)}") # Debug-Ausgabe in Konsole
-        pass
+        
 
     # Setzt das Bild zurück.
     def reset_image(self):
@@ -698,7 +698,7 @@ class App(QMainWindow):
         except Exception as e: # Fehlerbehandlung
             self.status.showMessage(f"Fehler beim Zurücksetzen des Bildes: {str(e)}")
             print(f"Fehler beim Zurücksetzen des Bildes: {str(e)}") # Debug-Ausgabe in Konsole
-        pass
+        
 
     # Lädt ein Bild aus einer Datei und setzt den Button zurück.
     def load_reset_file(self, checked):
@@ -716,7 +716,7 @@ class App(QMainWindow):
                 print("Bild zurücksetzen...")
         except Exception as e: # Fehlerbehandlung
             print(f"Fehler beim Laden/Zurücksetzen des Bildes: {str(e)}") # Debug-Ausgabe in Konsole
-        pass
+        
 
     # Erstellt einen Screenshot des aktuellen Frames.
     def save_screenshot(self):
@@ -732,8 +732,8 @@ class App(QMainWindow):
                 self.status.showMessage("Fehler: Screenshot konnte nicht gespeichert werden.")
         except Exception as e: # Fehlerbehandlung
             print(f"Fehler beim Speichern des Screenshots: {str(e)}") # Debug-Ausgabe in Konsole
-            pass
-
+            
+        
     # Aktualisiert den scaleFactor des Klassifizierers basierend auf dem Slider-Wert.
     def update_scaleFactor(self, value):
         try:
@@ -741,7 +741,7 @@ class App(QMainWindow):
             self.label_custom_scaleFactor.setText(f"scaleFactor: {value/10}")
         except Exception as e:
             print(f"Fehler beim Aktualisieren von scaleFactor: {str(e)}") # Debug-Ausgabe in Konsole    
-            pass
+            
 
     # Aktualisiert den minNeighbors des Klassifizierers basierend auf dem Slider-Wert.
     def update_minNeighbors(self, value):
@@ -750,7 +750,7 @@ class App(QMainWindow):
             self.label_custom_minNeighbors.setText(f"minNeighbors: {value}")
         except Exception as e: # Fehlerbehandlung
             print(f"Fehler beim Aktualisieren von minNeighbors: {str(e)}") # Debug-Ausgabe in Konsole
-            pass
+            
 
     # Aktualisiert den minSize des Klassifizierers basierend auf dem Slider-Wert.
     def update_minSize(self, value):
@@ -759,7 +759,7 @@ class App(QMainWindow):
             self.label_custom_minSize.setText(f"minSize: {value}")
         except Exception as e: # Fehlerbehandlung
             print(f"Fehler beim Aktualisieren von minSize: {str(e)}") # Debug-Ausgabe in Konsole    
-            pass
+            
 
     # Holt ein Frame von der Kamera und zeigt es in der GUI an. 
     def update_frame(self):
@@ -850,6 +850,6 @@ class App(QMainWindow):
                 cv2.rectangle(self.current_frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
         except Exception as e: # Fehlerbehandlung
             print(f"Fehler beim Aktualisieren des Frames: {str(e)}") # Debug-Ausgabe in Konsole
-            pass
+            
 
 
