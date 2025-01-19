@@ -77,9 +77,6 @@ class App(QMainWindow):
         try:    
             try:
                 self.load_stylesheet("style_sheet.css") # Um Fehlermeldung zu vermeiden
-            except:
-                pass
-            try:
                 self.load_stylesheet("b2-1_haarcascades/style_sheet.css") 
             except:
                 pass
@@ -96,7 +93,7 @@ class App(QMainWindow):
         elif type(self.i2) != type(None):    
             self.image = QImage(self.i2.data, self.i2.shape[1], self.i2.shape[0], QImage.Format.Format_RGB888)
         else: 
-            self.image = QImage(250,250)
+            self.image = QImage(250,250) # leeres Bild
         
         # Central Widget (Hauptbereich)
         self.central_widget = QWidget()
@@ -317,98 +314,97 @@ class App(QMainWindow):
     def animation(self):
         """
         Beispielanimation von Haar Cascade Features.
-        Sinnvoll um Response des GUI zu testen und lag zu erkennen
+        Sinnvoll um Response des GUI zu testen und durch Programmcode verursachten lag zu erkennen
         """
-        if self.x + 60 >= 250:
-            self.x = 0
-            self.y += 60
-            self.random_int = np.random.randint(0, 5)
+        try:
+            if self.x + 60 >= 250:
+                self.x = 0
+                self.y += 60
+                self.random_int = np.random.randint(0, 5)
 
-        if self.y + 60 >= 250:
-            self.x = 0
-            self.y = 0
-            
-        self.x += 10
-        self.draw_haar_filter()
-        pass
+            if self.y + 60 >= 250:
+                self.x = 0
+                self.y = 0
+                
+            self.x += 10
+            self.draw_haar_filter()
+        except Exception as e:
+            print(f"Fehler beim Erstellen der Animation: {str(e)}") # Debug-Ausgabe in Konsole    
+            pass
 
     # Zeichnet Haar Cascade Features als Overlay auf das Bild.
     def draw_haar_filter(self):
+        try:
+            overlay_pixmap = self.pixmap.copy() # Kopie des Originalbildes
+            painter = QPainter(overlay_pixmap) # Painter-Objekt für Overlay
+            x, y = self.x, self.y # Position des Haar Cascade Features
 
-        overlay_pixmap = self.pixmap.copy() # Kopie des Originalbildes
-        painter = QPainter(overlay_pixmap) # Painter-Objekt für Overlay
-        x, y = self.x, self.y # Position des Haar Cascade Features
+            # Zufällige Auswahl eines Haar Cascade Features
+            if self.random_int == 0:
+                painter.fillRect(QRect(x,      y, 20, 60), QColor("white"))
+                painter.fillRect(QRect(x + 20, y, 20, 60), QColor("black"))
+                painter.fillRect(QRect(x + 40, y, 20, 60), QColor("white"))
+            elif self.random_int == 1:
+                painter.fillRect(QRect(x, y,      60, 20), QColor("white"))
+                painter.fillRect(QRect(x, y + 20, 60, 20), QColor("black"))
+                painter.fillRect(QRect(x, y + 40, 60, 20), QColor("white"))
+            elif self.random_int == 2:
+                painter.fillRect(QRect(x     , y     , 30, 30), QColor("white"))
+                painter.fillRect(QRect(x + 30, y     , 30, 30), QColor("black"))
+                painter.fillRect(QRect(x     , y + 30, 30, 30), QColor("white"))
+                painter.fillRect(QRect(x + 30, y + 30, 30, 30), QColor("black"))
+            elif self.random_int == 3:
+                painter.fillRect(QRect(x     , y     , 30, 30), QColor("white"))
+                painter.fillRect(QRect(x + 30, y     , 30, 30), QColor("white"))
+                painter.fillRect(QRect(x     , y + 30, 30, 30), QColor("black"))
+                painter.fillRect(QRect(x + 30, y + 30, 30, 30), QColor("black"))
+            elif self.random_int == 4:
+                painter.fillRect(QRect(x     , y     , 30, 30), QColor("white"))
+                painter.fillRect(QRect(x + 30, y     , 30, 30), QColor("black"))
+                painter.fillRect(QRect(x     , y + 30, 30, 30), QColor("black"))
+                painter.fillRect(QRect(x + 30, y + 30, 30, 30), QColor("white"))
+            else:
+                painter.fillRect(QRect(x     , y     , 30, 30), QColor("black"))
+                painter.fillRect(QRect(x + 30, y     , 30, 30), QColor("white"))
+                painter.fillRect(QRect(x     , y + 30, 30, 30), QColor("white"))
+                painter.fillRect(QRect(x + 30, y + 30, 30, 30), QColor("black"))
 
-        # Zufällige Auswahl eines Haar Cascade Features
-        if self.random_int == 0:
-            painter.fillRect(QRect(x,      y, 20, 60), QColor("white"))
-            painter.fillRect(QRect(x + 20, y, 20, 60), QColor("black"))
-            painter.fillRect(QRect(x + 40, y, 20, 60), QColor("white"))
-        elif self.random_int == 1:
-            painter.fillRect(QRect(x, y,      60, 20), QColor("white"))
-            painter.fillRect(QRect(x, y + 20, 60, 20), QColor("black"))
-            painter.fillRect(QRect(x, y + 40, 60, 20), QColor("white"))
-        elif self.random_int == 2:
-            painter.fillRect(QRect(x     , y     , 30, 30), QColor("white"))
-            painter.fillRect(QRect(x + 30, y     , 30, 30), QColor("black"))
-            painter.fillRect(QRect(x     , y + 30, 30, 30), QColor("white"))
-            painter.fillRect(QRect(x + 30, y + 30, 30, 30), QColor("black"))
-        elif self.random_int == 3:
-            painter.fillRect(QRect(x     , y     , 30, 30), QColor("white"))
-            painter.fillRect(QRect(x + 30, y     , 30, 30), QColor("white"))
-            painter.fillRect(QRect(x     , y + 30, 30, 30), QColor("black"))
-            painter.fillRect(QRect(x + 30, y + 30, 30, 30), QColor("black"))
-        elif self.random_int == 4:
-            painter.fillRect(QRect(x     , y     , 30, 30), QColor("white"))
-            painter.fillRect(QRect(x + 30, y     , 30, 30), QColor("black"))
-            painter.fillRect(QRect(x     , y + 30, 30, 30), QColor("black"))
-            painter.fillRect(QRect(x + 30, y + 30, 30, 30), QColor("white"))
-        else:
-            painter.fillRect(QRect(x     , y     , 30, 30), QColor("black"))
-            painter.fillRect(QRect(x + 30, y     , 30, 30), QColor("white"))
-            painter.fillRect(QRect(x     , y + 30, 30, 30), QColor("white"))
-            painter.fillRect(QRect(x + 30, y + 30, 30, 30), QColor("black"))
-
-        painter.end()
-        self.animation_label.setPixmap(overlay_pixmap) # Overlay-Bild setzen
+            painter.end() 
+            self.animation_label.setPixmap(overlay_pixmap) # Overlay-Bild setzen
+        except Exception as e:
+            print(f"Fehler beim Anzeigen der Haar-Features: {str(e)}") # Debug-Ausgabe in Konsole
+            pass
 
     # Schaltet zwischen Vollbildmodus und Fenstermodus um.
     def toggle_fullscreen(self):
-        if self.isFullScreen():
-            self.showNormal()
-            self.fullscreen_action.setText("Vollbild")
-        else:
-            self.showFullScreen()
-            self.fullscreen_action.setText("Fenstermodus")
-        pass
+        try:
+            if self.isFullScreen():
+                self.showNormal()
+                self.fullscreen_action.setText("Vollbild")
+            else:
+                self.showFullScreen()
+                self.fullscreen_action.setText("Fenstermodus")
+        except Exception as e:
+            print(f"Fehler beim Umschalten des Vollbildmodus: {str(e)}") # Debug-Ausgabe in Konsole
+            pass
     
     # Schaltet zwischen Nachtmodus und Tagmodus (stylesheets) um.
     def toggle_nightmode(self):
         # Versuche Stylesheet zu laden
         if self.is_nightmode:
             try:
-                try:
                     self.load_stylesheet("style_sheet.css") # Um Fehlermeldung zu vermeiden
-                except:
-                    pass
-                try:
                     self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
-                except:
-                    pass    
+                    self.status.showMessage("Nachtmodus deaktiviert.")
             # Fehlerbehandlung beim Laden des Stylesheets
             except: 
                 print("Fehler beim Laden des Stylesheets, stelle sicher das du im richtigen Verzeichnis ../b2-1_haarcascades/main.py startest")
             self.nightmode_action.setText("Nachtmodus")
         else:
             try:  
-                try:
                     self.load_stylesheet("night_mode.css") # Um Fehlermeldung zu vermeiden
-                except:
-                    pass
-                try:
                     self.load_stylesheet("b2-1_haarcascades/night_mode.css")
-                except:
-                    pass                      
+                    self.status.showMessage("Nachtmodus aktiviert.")               
             # Fehlerbehandlung beim Laden des Stylesheets
             except: 
                 print("Fehler beim Laden des Stylesheets, stelle sicher das du im richtigen Verzeichnis ../b2-1_haarcascades/main.py startest")
@@ -445,27 +441,33 @@ class App(QMainWindow):
 
         Parameter: text (str): Text des ausgewählten Modus.
         """
-        if text == "live":
-            self.btn_start_camera.setEnabled(True)
-            self.btn_start_camera.setProperty("status","start")
-            self.btn_start_camera.style().unpolish(self.btn_start_camera) 
-            self.btn_start_camera.style().polish(self.btn_start_camera)    
-            self.btn_load_image.setEnabled(False)
-            self.btn_load_image.setProperty("status","unavailable")
-            self.btn_load_image.style().unpolish(self.btn_load_image)
-            self.btn_load_image.style().polish(self.btn_load_image)
-        elif text == "file":
-            self.btn_start_camera.setEnabled(False)
-            self.btn_start_camera.setProperty("status", "unavailable")
-            self.btn_start_camera.style().unpolish(self.btn_start_camera)
-            self.btn_start_camera.style().polish(self.btn_start_camera)
-            self.btn_load_image.setEnabled(True)
-            self.btn_load_image.setProperty("status","start")
-            self.btn_load_image.style().unpolish(self.btn_load_image)
-            self.btn_load_image.style().polish(self.btn_load_image)
-        else:
-            self.btn_start_camera.setEnabled(False)
-            self.btn_load_image.setEnabled(False)
+        try:
+            if text == "live":
+                self.btn_start_camera.setEnabled(True)
+                self.btn_start_camera.setProperty("status","start")
+                self.btn_start_camera.style().unpolish(self.btn_start_camera) 
+                self.btn_start_camera.style().polish(self.btn_start_camera)    
+                self.btn_load_image.setEnabled(False)
+                self.btn_load_image.setProperty("status","unavailable")
+                self.btn_load_image.style().unpolish(self.btn_load_image)
+                self.btn_load_image.style().polish(self.btn_load_image)
+                self.status.showMessage("Modus auf Live-Kamera geändert.")
+            elif text == "file":
+                self.btn_start_camera.setEnabled(False)
+                self.btn_start_camera.setProperty("status", "unavailable")
+                self.btn_start_camera.style().unpolish(self.btn_start_camera)
+                self.btn_start_camera.style().polish(self.btn_start_camera)
+                self.btn_load_image.setEnabled(True)
+                self.btn_load_image.setProperty("status","start")
+                self.btn_load_image.style().unpolish(self.btn_load_image)
+                self.btn_load_image.style().polish(self.btn_load_image)
+                self.status.showMessage("Modus auf Bild laden geändert.")
+            else:
+                self.btn_start_camera.setEnabled(False)
+                self.btn_load_image.setEnabled(False)
+        except Exception as e:
+            print(f"Fehler beim Ändern des Modus: {str(e)}") # Debug-Ausgabe in Konsole
+            self.status.showMessage(f"Fehler beim Ändern des Modus: {str(e)}") # Statusnachricht in Statusleiste
         pass
     
     # Ändert den Klassifizierer basierend auf der Auswahl im Dropdown-Menü.
@@ -475,33 +477,37 @@ class App(QMainWindow):
 
         Parameter: text (str): Text des ausgewählten Klassifizierers.
         """
-        self.btn_choose_classifier.setEnabled(False)
-        self.slider_custom_scaleFactor.setEnabled(False)
-        self.slider_custom_minNeighbors.setEnabled(False)
-        self.slider_custom_minSize.setEnabled(False)
-        self.custom_classifier_label.setText("")
-        if text == "face":
-            self.load_predefined_classifier("face")
-        elif text == "eye":
-            self.load_predefined_classifier("eye")
-        elif text == "smile":
-            self.load_predefined_classifier("smile")
-        elif text == "upperbody":
-            self.load_predefined_classifier("upperbody")
-        elif text == "fullbody":
-            self.load_predefined_classifier("fullbody")
-        elif text == "profileface":
-            self.load_predefined_classifier("profileface")
-        elif text == "Eigener Klassifizierer":
-            self.classifier_manager.current_classifier ="custom"
-            self.btn_choose_classifier.setEnabled(True)
-            self.slider_custom_scaleFactor.setEnabled(True)
-            self.slider_custom_minNeighbors.setEnabled(True)
-            self.slider_custom_minSize.setEnabled(True)
-            self.custom_classifier_label.setText("Datei auswählen...")
-        else:
-            self.classifier_manager.load_classifier("face")
-        pass
+        try:
+            self.btn_choose_classifier.setEnabled(False)
+            self.slider_custom_scaleFactor.setEnabled(False)
+            self.slider_custom_minNeighbors.setEnabled(False)
+            self.slider_custom_minSize.setEnabled(False)
+            self.custom_classifier_label.setText("")
+            if text == "face":
+                self.load_predefined_classifier("face")
+            elif text == "eye":
+                self.load_predefined_classifier("eye")
+            elif text == "smile":
+                self.load_predefined_classifier("smile")
+            elif text == "upperbody":
+                self.load_predefined_classifier("upperbody")
+            elif text == "fullbody":
+                self.load_predefined_classifier("fullbody")
+            elif text == "profileface":
+                self.load_predefined_classifier("profileface")
+            elif text == "Eigener Klassifizierer":
+                self.classifier_manager.current_classifier ="custom"
+                self.btn_choose_classifier.setEnabled(True)
+                self.slider_custom_scaleFactor.setEnabled(True)
+                self.slider_custom_minNeighbors.setEnabled(True)
+                self.slider_custom_minSize.setEnabled(True)
+                self.custom_classifier_label.setText("Datei auswählen...")
+            else:
+                self.classifier_manager.load_classifier("face")
+        except Exception as e:
+            print(f"Fehler beim Ändern des Klassifizierers: {str(e)}") # Debug-Ausgabe in Konsole
+            self.status.showMessage(f"Fehler beim Ändern des Klassifizierers: {str(e)}") # Statusnachricht in Statusleiste
+            pass
 
     # Lädt vordefinierte Klassifizierer mit den entsprechenden Parametern.
     def load_predefined_classifier(self, classifier_id):
@@ -510,51 +516,63 @@ class App(QMainWindow):
 
         Parameter: classifier_id (str): ID des Klassifizierers (z. B. "face", "eye", "smile").
         """
-        self.classifier_manager.load_classifier(classifier_id)
-        self.slider_custom_scaleFactor.blockSignals(True)
-        self.slider_custom_minNeighbors.blockSignals(True)
-        self.slider_custom_minSize.blockSignals(True)
-        self.slider_custom_scaleFactor.setValue(int(self.classifier_manager.classifiers[classifier_id]["scaleFactor"]*10))
-        self.label_custom_scaleFactor.setText(f"scaleFactor: {self.classifier_manager.classifiers[classifier_id]['scaleFactor']}")
-        self.slider_custom_minNeighbors.setValue(self.classifier_manager.classifiers[classifier_id]["minNeighbors"])
-        self.label_custom_minNeighbors.setText(f"minNeighbors: {self.classifier_manager.classifiers[classifier_id]['minNeighbors']}")
-        self.slider_custom_minSize.setValue(self.classifier_manager.classifiers[classifier_id]["minSize"][0])
-        self.label_custom_minSize.setText(f"minSize: {self.classifier_manager.classifiers[classifier_id]['minSize'][0]}")
-        self.slider_custom_scaleFactor.blockSignals(False)
-        self.slider_custom_minNeighbors.blockSignals(False)
-        self.slider_custom_minSize.blockSignals(False)
-        pass
+        try:
+            self.classifier_manager.load_classifier(classifier_id)
+            self.slider_custom_scaleFactor.blockSignals(True)
+            self.slider_custom_minNeighbors.blockSignals(True)
+            self.slider_custom_minSize.blockSignals(True)
+            self.slider_custom_scaleFactor.setValue(int(self.classifier_manager.classifiers[classifier_id]["scaleFactor"]*10))
+            self.label_custom_scaleFactor.setText(f"scaleFactor: {self.classifier_manager.classifiers[classifier_id]['scaleFactor']}")
+            self.slider_custom_minNeighbors.setValue(self.classifier_manager.classifiers[classifier_id]["minNeighbors"])
+            self.label_custom_minNeighbors.setText(f"minNeighbors: {self.classifier_manager.classifiers[classifier_id]['minNeighbors']}")
+            self.slider_custom_minSize.setValue(self.classifier_manager.classifiers[classifier_id]["minSize"][0])
+            self.label_custom_minSize.setText(f"minSize: {self.classifier_manager.classifiers[classifier_id]['minSize'][0]}")
+            self.slider_custom_scaleFactor.blockSignals(False)
+            self.slider_custom_minNeighbors.blockSignals(False)
+            self.slider_custom_minSize.blockSignals(False)
+            self.status.showMessage(f"Vordefinierter Klassifizierer {classifier_id} geladen.")
+        except Exception as e:
+            print(f"Fehler beim Laden des vordefinierten Klassifizierers: {str(e)}") # Debug-Ausgabe in Konsole
+            self.status.showMessage(f"Fehler beim Laden des vordefinierten Klassifizierers: {str(e)}") # Statusnachricht in Statusleiste
+            pass
 
     # Lädt benutzerdefinierten Klassifizierer aus einer Datei.
     def load_custom_classifier(self):
-        classifier_name = self.classifier_manager.load_custom_classifier()
-        self.custom_classifier_label.setText(classifier_name)
-        pass
+        try:
+            classifier_name = self.classifier_manager.load_custom_classifier()
+            self.custom_classifier_label.setText(classifier_name)
+            self.status.showMessage(f"Benutzerdefinierter Klassifizierer {classifier_name} geladen.")
+        except Exception as e:
+            print(f"Fehler beim Laden des benutzerdefinierten Klassifizierers: {str(e)}") # Debug-Ausgabe in Konsole
+            self.status.showMessage(f"Fehler beim Laden des benutzerdefinierten Klassifizierers: {str(e)}") # Statusnachricht in Statusleiste
+            pass
 
     # Aktualisiert die Liste der verfügbaren Kameras.
     def refresh_camera_list(self):
         """
         Aktualisiert die Liste der verfügbaren Kameras.
         """
-        available_cameras = self.camera_manager.detect_cameras()
-        self.camera_selector.clear()
-        if available_cameras:
-            camera_names = [f"Kamera {index}" for index in available_cameras]
-            self.camera_selector.addItems(camera_names)
-            self.status.showMessage(f"Kameras gefunden: {camera_names}")
-            self.btn_start_camera.setEnabled(True)
-            self.btn_start_camera.setProperty("status","start")
-            self.btn_start_camera.style().unpolish(self.btn_start_camera) # Zurücksetzen des Styles 
-            self.btn_start_camera.style().polish(self.btn_start_camera) # Neuanwenden des Styles
-        else:
-            self.camera_selector.addItem("Keine Kamera erkannt")
-            self.status.showMessage("Keine Kameras gefunden.")
-            self.btn_start_camera.setEnabled(False) # Bug: setEnable ändert Button-Style nicht automatisch"
-            self.btn_start_camera.setProperty("status", "unavailable") # Ändert Style des Buttons durch Property (Style Sheet)
-            self.btn_start_camera.style().unpolish(self.btn_start_camera) # Zurücksetzen des Styles 
-            self.btn_start_camera.style().polish(self.btn_start_camera) # Neuanwenden des Styles
-            
-        pass
+        try:
+            available_cameras = self.camera_manager.detect_cameras()
+            self.camera_selector.clear()
+            if available_cameras:
+                camera_names = [f"Kamera {index}" for index in available_cameras]
+                self.camera_selector.addItems(camera_names)
+                self.status.showMessage(f"Kameras gefunden: {camera_names}")
+                self.btn_start_camera.setEnabled(True)
+                self.btn_start_camera.setProperty("status","start")
+                self.btn_start_camera.style().unpolish(self.btn_start_camera) # Zurücksetzen des Styles 
+                self.btn_start_camera.style().polish(self.btn_start_camera) # Neuanwenden des Styles
+            else:
+                self.camera_selector.addItem("Keine Kamera erkannt")
+                self.status.showMessage("Keine Kameras gefunden.")
+                self.btn_start_camera.setEnabled(False) # Bug: setEnable ändert Button-Style nicht automatisch"
+                self.btn_start_camera.setProperty("status", "unavailable") # Ändert Style des Buttons durch Property (Style Sheet)
+                self.btn_start_camera.style().unpolish(self.btn_start_camera) # Zurücksetzen des Styles 
+                self.btn_start_camera.style().polish(self.btn_start_camera) # Neuanwenden des Styles
+        except Exception as e:
+            print(f"Fehler beim Aktualisieren der Kamera-Liste: {str(e)}") # Debug-Ausgabe in Konsole
+            pass    
 
     # Startet die Kamera.   
     def start_camera(self):
@@ -576,8 +594,9 @@ class App(QMainWindow):
             self.status.showMessage(f"Kamera {camera_index} erfolgreich gestartet.")
             self.timer.start(10)  # Update alle 10 ms
         except Exception as e:
-            self.animation_label.setText(f"Kamera konnte nicht gestartet werden: {str(e)}")
+            self.animation_label.setText(f"Kamera konnte nicht gestartet werden: {str(e)}") 
             self.status.showMessage(f"Kamera-Fehler: {str(e)}")
+            print(f"Kamera konnte nicht gestartet werden: {str(e)}") # Debug-Ausgabe in Konsole
         pass
     
     # Stoppt die Kamera.
@@ -585,24 +604,27 @@ class App(QMainWindow):
         """
         Stoppt die Kamera und gibt Ressourcen frei.
         """
-        self.btn_refresh_cameras.setEnabled(True)
-        self.camera_selector.setEnabled(True)
-        self.mode_selector.setEnabled(True)
-        self.classifier_selector.setEnabled(True)
-        self.btn_start_camera.setProperty("status","start") # Setzt Property für Style zurück
-        self.btn_start_camera.style().unpolish(self.btn_start_camera) # Zurücksetzen des Styles 
-        self.btn_start_camera.style().polish(self.btn_start_camera) # Neuanwenden des Styles
-        self.btn_start_camera.setText("Live-Kamera Starten")
-        self.status.showMessage("Kamera wird gestoppt...") # Statusnachricht in Statusleiste
-        self.camera_manager.stop_camera() # Kamera stoppen aus CameraManager ausführen
-        self.timer.stop() # Timer stoppen(keine Frames mehr aktualisieren)
-        self.num_objects = 0 # Anzahl der erkannten Objekte auf 0 zurücksetzen
-        self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
+        try:
+            self.btn_refresh_cameras.setEnabled(True)
+            self.camera_selector.setEnabled(True)
+            self.mode_selector.setEnabled(True)
+            self.classifier_selector.setEnabled(True)
+            self.btn_start_camera.setProperty("status","start") # Setzt Property für Style zurück
+            self.btn_start_camera.style().unpolish(self.btn_start_camera) # Zurücksetzen des Styles 
+            self.btn_start_camera.style().polish(self.btn_start_camera) # Neuanwenden des Styles
+            self.btn_start_camera.setText("Live-Kamera Starten")
+            self.status.showMessage("Kamera wird gestoppt...") # Statusnachricht in Statusleiste
+            self.camera_manager.stop_camera() # Kamera stoppen aus CameraManager ausführen
+            self.timer.stop() # Timer stoppen(keine Frames mehr aktualisieren)
+            self.num_objects = 0 # Anzahl der erkannten Objekte auf 0 zurücksetzen
+            self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
 
-        self.image_display.clear()  # Bildanzeige leeren
-        self.image_display.setText("Anzeigebereich für Bilder/Kamera")  # Optionale Standardnachricht
-        self.status.showMessage("Kamera gestoppt.") # Statusnachricht in Statusleiste
-        pass
+            self.image_display.clear()  # Bildanzeige leeren
+            self.image_display.setText("Anzeigebereich für Bilder/Kamera")  # Optionale Standardnachricht
+            self.status.showMessage("Kamera gestoppt.") # Statusnachricht in Statusleiste
+        except Exception as e: # Fehlerbehandlung
+            print(f"Fehler beim Stoppen der Kamera: {str(e)}") # Debug-Ausgabe in Konsole
+            pass
 
 
     # Startet oder stoppt die Kamera, je nach Status des Buttons.
@@ -646,7 +668,7 @@ class App(QMainWindow):
 
         except Exception as e: # Fehlerbehandlung
             self.status.showMessage(f"Fehler beim Laden des Bildes: {str(e)}")
-            print(f"Fehler beim Laden des Bildes: {str(e)}")
+            print(f"Fehler beim Laden des Bildes: {str(e)}") # Debug-Ausgabe in Konsole
         pass
 
     # Setzt das Bild zurück.
@@ -675,7 +697,7 @@ class App(QMainWindow):
             print("Bild zurückgesetzt.") # Debug-Ausgabe in Konsole
         except Exception as e: # Fehlerbehandlung
             self.status.showMessage(f"Fehler beim Zurücksetzen des Bildes: {str(e)}")
-            print(f"Fehler beim Zurücksetzen des Bildes: {str(e)}")
+            print(f"Fehler beim Zurücksetzen des Bildes: {str(e)}") # Debug-Ausgabe in Konsole
         pass
 
     # Lädt ein Bild aus einer Datei und setzt den Button zurück.
@@ -685,12 +707,15 @@ class App(QMainWindow):
 
         Parameter: checked (bool): Status des Buttons (True = Laden, False = Zurücksetzen).
         """
-        if checked:
-            self.load_image_from_file()
-            print("Bild laden...")
-        else:
-            self.reset_image()
-            print("Bild zurücksetzen...")
+        try:
+            if checked:
+                self.load_image_from_file()
+                print("Bild laden...")
+            else:
+                self.reset_image()
+                print("Bild zurücksetzen...")
+        except Exception as e: # Fehlerbehandlung
+            print(f"Fehler beim Laden/Zurücksetzen des Bildes: {str(e)}") # Debug-Ausgabe in Konsole
         pass
 
     # Erstellt einen Screenshot des aktuellen Frames.
@@ -698,118 +723,133 @@ class App(QMainWindow):
         """
         Speichert einen Screenshot des aktuellen Frames.
         """
-        self.status.showMessage("Screenshot wird gespeichert...")
-        
-        if self.file_manager.save_screenshot(self.current_frame): # Aufruf der Methode zum Speichern eines Screenshots aus dem FileManager
-            self.status.showMessage("Screenshot erfolgreich gespeichert.")
-        else:
-            self.status.showMessage("Fehler: Screenshot konnte nicht gespeichert werden.")
-        pass
+        try:
+            self.status.showMessage("Screenshot wird gespeichert...")
+            
+            if self.file_manager.save_screenshot(self.current_frame): # Aufruf der Methode zum Speichern eines Screenshots aus dem FileManager
+                self.status.showMessage("Screenshot erfolgreich gespeichert.")
+            else:
+                self.status.showMessage("Fehler: Screenshot konnte nicht gespeichert werden.")
+        except Exception as e: # Fehlerbehandlung
+            print(f"Fehler beim Speichern des Screenshots: {str(e)}") # Debug-Ausgabe in Konsole
+            pass
 
     # Aktualisiert den scaleFactor des Klassifizierers basierend auf dem Slider-Wert.
     def update_scaleFactor(self, value):
-        self.classifier_manager.update_scaleFactor(value/10)
-        self.label_custom_scaleFactor.setText(f"scaleFactor: {value/10}")
-        pass
+        try:
+            self.classifier_manager.update_scaleFactor(value/10)
+            self.label_custom_scaleFactor.setText(f"scaleFactor: {value/10}")
+        except Exception as e:
+            print(f"Fehler beim Aktualisieren von scaleFactor: {str(e)}") # Debug-Ausgabe in Konsole    
+            pass
 
     # Aktualisiert den minNeighbors des Klassifizierers basierend auf dem Slider-Wert.
     def update_minNeighbors(self, value):
-        self.classifier_manager.update_minNeighbors(value)
-        self.label_custom_minNeighbors.setText(f"minNeighbors: {value}")
-        pass
+        try:
+            self.classifier_manager.update_minNeighbors(value)
+            self.label_custom_minNeighbors.setText(f"minNeighbors: {value}")
+        except Exception as e: # Fehlerbehandlung
+            print(f"Fehler beim Aktualisieren von minNeighbors: {str(e)}") # Debug-Ausgabe in Konsole
+            pass
 
     # Aktualisiert den minSize des Klassifizierers basierend auf dem Slider-Wert.
     def update_minSize(self, value):
-        self.classifier_manager.update_minSize(value)
-        self.label_custom_minSize.setText(f"minSize: {value}")
-        pass
+        try:
+            self.classifier_manager.update_minSize(value)
+            self.label_custom_minSize.setText(f"minSize: {value}")
+        except Exception as e: # Fehlerbehandlung
+            print(f"Fehler beim Aktualisieren von minSize: {str(e)}") # Debug-Ausgabe in Konsole    
+            pass
 
     # Holt ein Frame von der Kamera und zeigt es in der GUI an. 
     def update_frame(self):
         """
         Lädt den aktuellen Frame, auf grundlage das Aktuellen Modus(live/file) und erkennt Objekte und zeigt Sie in der GUI an.
         """
-        if self.mode_selector.currentText() == "live": # Abfrage des aktuellen Modus, wenn Modus "live", dann
-            frame, ret = self.camera_manager.get_frame() # Frame von Kamera holen mit Aufruf aus CameraManager
-            if not ret: # Wenn Kamera keine Frames mehr liefert/disconnected, stoppe Kamera und aktualisiere Kamera-Liste
-                self.stop_camera()
-                self.refresh_camera_list()
-                self.btn_start_camera.setChecked(False)
-                return  
-            
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, Umwandlung in RGB
-            self.current_frame = frame
-
-            # Objekterkennung
-            objects = self.classifier_manager.detect_faces(frame, self.classifier_manager.current_classifier) # Aufruf der Methode zur Objekterkennung aus dem ClassifierManager
-            self.num_objects = len(objects) # Anzahl der erkannten Objekte
-            self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
+        try:
+            if self.mode_selector.currentText() == "live": # Abfrage des aktuellen Modus, wenn Modus "live", dann
+                frame, ret = self.camera_manager.get_frame() # Frame von Kamera holen mit Aufruf aus CameraManager
+                if not ret: # Wenn Kamera keine Frames mehr liefert/disconnected, stoppe Kamera und aktualisiere Kamera-Liste
+                    self.stop_camera()
+                    self.refresh_camera_list()
+                    self.btn_start_camera.setChecked(False)
+                    return  
                 
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # OpenCV (standard) BGR, Umwandlung in RGB
+                self.current_frame = frame
+
+                # Objekterkennung
+                objects = self.classifier_manager.detect_faces(frame, self.classifier_manager.current_classifier) # Aufruf der Methode zur Objekterkennung aus dem ClassifierManager
+                self.num_objects = len(objects) # Anzahl der erkannten Objekte
+                self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
+                    
+                # Zeichne grüne Rechtecke um erkannte Gesichter
+                for (x, y, w, h) in objects:
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
+                
+                # Anzeige des Frames im Anzeigebereich
+                height, width, channel = frame.shape # Größe des Frames
+                aspect_ratio = height/width # Seitenverhältnis
+                bytes_per_line = 3 * width  # 3 Kanäle pro Pixel (RGB)
+
+                q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888) # Erstelle QImage aus Frame 
+                pixmap = QPixmap.fromImage(q_image) # Erstelle Pixmap aus QImage
+
+                # Logik für das Skalieren des Bildes
+                i_h = self.image_display.height() # Höhe des QLabel(image_display)
+                w_asp = int(i_h * (width/height)) # Berechne Breite des Bildes basierend auf Höhe und Seitenverhältnis
+                if(w_asp <= self.image_display.width()): 
+                    i_w = w_asp 
+                else:
+                    i_w = self.image_display.width()
+                    i_h = int(i_w * aspect_ratio)
+                scaled_pixmap = pixmap.scaled(i_w,i_h) 
+                self.image_display.setPixmap(scaled_pixmap) # Setze Pixmap in QLabel(image_display)
+                
+            elif self.mode_selector.currentText() == "file": # Abfrage des aktuellen Modus, wenn Modus "live", dann
+                
+                frame = self.static_image 
+                self.current_frame = frame
+
+                # Objekterkennung
+                objects = self.classifier_manager.detect_faces(frame, self.classifier_manager.current_classifier)
+                self.num_objects = len(objects) # Anzahl der erkannten Objekte
+                self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
+                    
+                # Zeichne grüne Rechtecke um erkannte Gesichter
+                for (x, y, w, h) in objects:
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
+
+                height, width, channel = frame.shape # Größe des Frames
+                aspect_ratio = height/width # Seitenverhältnis
+                bytes_per_line = 3 * width  # 3 Kanäle pro Pixel (RGB)
+
+                q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888) # Erstelle QImage aus Frame 
+                pixmap = QPixmap.fromImage(q_image) # Erstelle Pixmap aus QImage
+
+                # Logik für das Skalieren des Bildes
+                i_h = self.image_display.height() # Höhe des QLabel(image_display)
+                w_asp = int(i_h * (width/height)) # Berechne Breite des Bildes basierend auf Höhe und Seitenverhältnis
+                if(w_asp <= self.image_display.width()): 
+                    i_w = w_asp 
+                else:
+                    i_w = self.image_display.width()
+                    i_h = int(i_w * aspect_ratio)
+                scaled_pixmap = pixmap.scaled(i_w,i_h) 
+                self.image_display.setPixmap(scaled_pixmap) # Setze Pixmap in QLabel(image_display)         
+                
+
+            # Screenshot-Button aktivieren, wenn Frame vorhanden
+            if not self.current_frame is None:
+                self.btn_screenshot.setEnabled(True)
+            else:
+                self.btn_screenshot.setEnabled(False)
+            self.current_frame = cv2.cvtColor(self.current_frame, cv2.COLOR_RGB2BGR) # OpenCV (standard) BGR, Umwandlung in RGB
             # Zeichne grüne Rechtecke um erkannte Gesichter
             for (x, y, w, h) in objects:
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
-            
-            # Anzeige des Frames im Anzeigebereich
-            height, width, channel = frame.shape # Größe des Frames
-            aspect_ratio = height/width # Seitenverhältnis
-            bytes_per_line = 3 * width  # 3 Kanäle pro Pixel (RGB)
-
-            q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888) # Erstelle QImage aus Frame 
-            pixmap = QPixmap.fromImage(q_image) # Erstelle Pixmap aus QImage
-
-            # Logik für das Skalieren des Bildes
-            i_h = self.image_display.height() # Höhe des QLabel(image_display)
-            w_asp = int(i_h * (width/height)) # Berechne Breite des Bildes basierend auf Höhe und Seitenverhältnis
-            if(w_asp <= self.image_display.width()): 
-                i_w = w_asp 
-            else:
-                i_w = self.image_display.width()
-                i_h = int(i_w * aspect_ratio)
-            scaled_pixmap = pixmap.scaled(i_w,i_h) 
-            self.image_display.setPixmap(scaled_pixmap) # Setze Pixmap in QLabel(image_display)
-            
-        elif self.mode_selector.currentText() == "file": # Abfrage des aktuellen Modus, wenn Modus "live", dann
-            
-            frame = self.static_image 
-            self.current_frame = frame
-
-            # Objekterkennung
-            objects = self.classifier_manager.detect_faces(frame, self.classifier_manager.current_classifier)
-            self.num_objects = len(objects) # Anzahl der erkannten Objekte
-            self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
-                
-            # Zeichne grüne Rechtecke um erkannte Gesichter
-            for (x, y, w, h) in objects:
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
-
-            height, width, channel = frame.shape # Größe des Frames
-            aspect_ratio = height/width # Seitenverhältnis
-            bytes_per_line = 3 * width  # 3 Kanäle pro Pixel (RGB)
-
-            q_image = QImage(frame.data, width, height, bytes_per_line, QImage.Format.Format_RGB888) # Erstelle QImage aus Frame 
-            pixmap = QPixmap.fromImage(q_image) # Erstelle Pixmap aus QImage
-
-            # Logik für das Skalieren des Bildes
-            i_h = self.image_display.height() # Höhe des QLabel(image_display)
-            w_asp = int(i_h * (width/height)) # Berechne Breite des Bildes basierend auf Höhe und Seitenverhältnis
-            if(w_asp <= self.image_display.width()): 
-                i_w = w_asp 
-            else:
-                i_w = self.image_display.width()
-                i_h = int(i_w * aspect_ratio)
-            scaled_pixmap = pixmap.scaled(i_w,i_h) 
-            self.image_display.setPixmap(scaled_pixmap) # Setze Pixmap in QLabel(image_display)         
-            
-
-        # Screenshot-Button aktivieren, wenn Frame vorhanden
-        if not self.current_frame is None:
-            self.btn_screenshot.setEnabled(True)
-        else:
-            self.btn_screenshot.setEnabled(False)
-        self.current_frame = cv2.cvtColor(self.current_frame, cv2.COLOR_RGB2BGR) # OpenCV (standard) BGR, Umwandlung in RGB
-        # Zeichne grüne Rechtecke um erkannte Gesichter
-        for (x, y, w, h) in objects:
-            cv2.rectangle(self.current_frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
-        pass
+                cv2.rectangle(self.current_frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
+        except Exception as e: # Fehlerbehandlung
+            print(f"Fehler beim Aktualisieren des Frames: {str(e)}") # Debug-Ausgabe in Konsole
+            pass
 
 
