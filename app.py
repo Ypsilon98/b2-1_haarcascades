@@ -194,8 +194,8 @@ class App(QMainWindow):
         self.label_custom_scaleFactor = QLabel("scaleFactor:")
         self.slider_custom_scaleFactor = QSlider(Qt.Orientation.Horizontal)
         self.slider_custom_scaleFactor.setRange(10, 30)  # Range from 1.0 to 3.0 (multiplied by 10)
-        self.slider_custom_scaleFactor.setValue(12)  # Default value 1.2
-        self.label_custom_scaleFactor.setText(f"scaleFactor: {self.slider_custom_scaleFactor.value()}")
+        self.slider_custom_scaleFactor.setValue(1.05)  # Default value 1.2
+        self.label_custom_scaleFactor.setText(f"scaleFactor: {self.slider_custom_scaleFactor.value()/10}")
         self.slider_custom_scaleFactor.valueChanged.connect(self.update_scaleFactor)
         self.slider_custom_scaleFactor.setSingleStep(1)
         self.slider_custom_scaleFactor.setEnabled(False)
@@ -377,7 +377,7 @@ class App(QMainWindow):
         QMessageBox.about(self, "Kurzanleitung",  "Kamera und Modus auswählen und auf Live-Kamera Starten klicken.\n\nAlternativ Modus auf 'file' setzen und Bild Laden.\n\nObjekte werden automatisch erkannt, markiert und gezählt.\n\nVortrainierte als auch eigene Klassifizierer können geladen werden.\n\nDazu einfach den entsprechenden Button klicken und die XML-Datei auswählen.\n\nViel Spaß!")
 
     def show_about(self):
-        QMessageBox.about(self, "Über", "Anwendung zur Objekterkennung mit Haarcascades\n\nProgrammiert von der Projektgruppe B2-1 im Master AKI an der FH SWF Iserlohn\n\nYannick\nEmelie\nLeon\nPhilipp\n\nJanuar 2025")
+        QMessageBox.about(self, "Über", "Anwendung zur Objekterkennung mit Haarcascades\n\nProgrammiert von der Projektgruppe B2-1 im Master AKI an der FH SWF Iserlohn\n\nYannic\nEmelie\nLeon\nPhilipp\n\nJanuar 2025")
 
     # Lädt ein Stylesheet aus einer Datei.
     # Parameters: filename (str): Dateiname des Stylesheets.
