@@ -1,10 +1,11 @@
 import cv2
-import os
+import numpy as np
+# Importe aus den PySide6-Bibliotheken (für Layout, GUI-Elemente, etc.)
 from PySide6.QtWidgets import QMainWindow, QWidget, QPushButton, QLabel, QComboBox, QStatusBar, QMessageBox, QSlider
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QSizePolicy 
 from PySide6.QtGui import QPixmap, QImage , QPainter, QColor, QAction
 from PySide6.QtCore import QTimer, Qt, QRect
-import numpy as np
+# Importe der Manager-Klassen
 from cameramanager import CameraManager
 from classifiermanager import ClassifierManager
 from filemanager import FileManager
