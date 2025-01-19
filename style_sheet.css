@@ -1,9 +1,9 @@
 QMainWindow {
-    font-family: 'Segoe UI';
+    font-family: 'Segoe UI'; 
     font-size: 14px;
     background-color: white;
 }
-
+/* Label */
 QLabel {
     font-family: 'Segoe UI';
     font-weight: bold;
@@ -16,11 +16,11 @@ QLabel[status="display"] {
     font-weight: bold;
     font-size: 14px;
     color: black;
-    background-color: #dcdcdc; /* Light Gray */ 
+    background-color: #dcdcdc; /* Helles Grau, fast weiss */ 
     border: 1px solid black;
 }
 
-
+/* Buttons */
 QPushButton {
     font-family: 'Segoe UI';
     font-size: 14px;
@@ -50,11 +50,15 @@ QPushButton[status="unavailable"] {
     background-color: gray;
 }
 
+/* Drop-Down-Menu */
 QComboBox {
     font-family: 'Segoe UI';
     font-size: 14px;
+    color: black;
+    background-color: white;
 }
 
+/* Menüleiste */
 QMenuBar {
     color: black;
     background-color: #f0f0f0;
@@ -79,6 +83,7 @@ QMenu::item:selected {
     color: black;
 }
 
+/* Pop Up Fenster */
 QMessageBox {
     font-family: 'Segoe UI';
     font-size: 14px;
@@ -89,16 +94,13 @@ QMessageBox QLabel {
     font-weight: normal;
 }
 
+/* Statusleiste */
 QStatusBar {  
     color: black;
-    background-color: white;             
+    background-color: transparent;             
 }
 
-QComboBox {
-    color: black;
-    background-color: white;
-}
-
+/* Slider */
 QSlider {
     color: black;
     background: transparent;

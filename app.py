@@ -12,14 +12,56 @@ from filemanager import FileManager
 # Hauptklasse App für GUI
 class App(QMainWindow):
     """
-    Hauptklasse für die GUI-Anwendung.
+    Hauptklasse für die GUI-Anwendung. 
 
-    Attribute:  
-
-     Methoden:  
+    Attribute: camera_manager (CameraManager): Instanz des CameraManagers.
+               classifier_manager (ClassifierManager): Instanz des ClassifierManagers.
+               file_manager (FileManager): Instanz des FileManager.
+               central_widget (QWidget): Zentrales Widget der Anwendung.
+               status (QStatusBar): Statusleiste der Anwendung.
+               
+               image_display (QLabel): Anzeigebereich für Bilder/Kamera.
+               animation_label (QLabel): Anzeigebereich für die Beispielanimation.
+               camera_selector (QComboBox): Dropdown-Menü für die Auswahl der Kamera.
+               mode_selector (QComboBox): Dropdown-Menü für die Auswahl des Modus.
+               classifier_selector (QComboBox): Dropdown-Menü für die Auswahl des Klassifizierers.
+               slider_custom_scaleFactor (QSlider): Slider für den scaleFactor des Klassifizierers.
+               slider_custom_minNeighbors (QSlider): Slider für den minNeighbors des Klassifizierers.
+               slider_custom_minSize (QSlider): Slider für den minSize des Klassifizierers.
+               custom_classifier_label (QLabel): Label für die Anzeige des benutzerdefinierten Klassifizierers.
+               
+               btn_refresh_cameras (QPushButton): Button zum Aktualisieren der Kamera-Liste.
+               btn_load_image (QPushButton): Button zum Laden eines Bildes.
+               btn_start_camera (QPushButton): Button zum Starten/Stoppen der Kamera.
+               btn_choose_classifier (QPushButton): Button zum Laden eines benutzerdefinierten Klassifizierers.
+               btn_train_classifier (QPushButton): Button zum Trainieren des Klassifizierers.
+               btn_screenshot (QPushButton): Button zum Erstellen eines Screenshots.
+               
+               num_objects (int): Anzahl der erkannten Objekte.
+               object_count_label (QLabel): Label zur Anzeige der Anzahl der erkannten Objekte.
+               
+               timer (QTimer): Timer für die Aktualisierung der Frames.
+               animation_timer (QTimer): Timer für die Beispielanimation.
+               
+               current_frame (np.ndarray): Aktueller Frame.
+               static_image (np.ndarray): Statisches Bild.
+               is_nightmode (bool): Nachtmodus-Status.
+    
+    Methoden:   __init__()
+                toggle_fullscreen(), toggle_nightmode() 
+                show_help(), show_about(), 
+                load_stylesheet(filename),
+                change_mode(text), change_classifier(text), load_predefined_classifier(classifier_id), load_custom_classifier(),
+                refresh_camera_list(), start_camera(), stop_camera(), start_stop_camera(checked), 
+                load_image_from_file(), reset_image(), load_reset_file(checked), 
+                animation(), draw_haar_filter(), 
+                update_frame().
     """
+    # Initialisiert die GUI und die Manager-Instanzen.
     def __init__(self):
-        # Initialisiert die GUI und die Manager-Instanzen.
+        """
+        Initialisiert die GUI Elemente und Manager Instanzen.
+        """
         super().__init__()
         
         # Manager Instanzen
@@ -684,7 +726,7 @@ class App(QMainWindow):
     # Holt ein Frame von der Kamera und zeigt es in der GUI an. 
     def update_frame(self):
         """
-        Lädt den aktuellen Frame, erkennt Objekte und zeigt sie in der GUI an.
+        Lädt den aktuellen Frame, auf grundlage das Aktuellen Modus(live/file) und erkennt Objekte und zeigt Sie in der GUI an.
         """
         if self.mode_selector.currentText() == "live": # Abfrage des aktuellen Modus, wenn Modus "live", dann
             frame, ret = self.camera_manager.get_frame() # Frame von Kamera holen mit Aufruf aus CameraManager
@@ -725,7 +767,7 @@ class App(QMainWindow):
             scaled_pixmap = pixmap.scaled(i_w,i_h) 
             self.image_display.setPixmap(scaled_pixmap) # Setze Pixmap in QLabel(image_display)
             
-        elif self.mode_selector.currentText() == "file": # Abfrage des aktuellen Modus, wenn Modus "live", 
+        elif self.mode_selector.currentText() == "file": # Abfrage des aktuellen Modus, wenn Modus "live", dann
             
             frame = self.static_image 
             self.current_frame = frame
@@ -758,19 +800,15 @@ class App(QMainWindow):
             self.image_display.setPixmap(scaled_pixmap) # Setze Pixmap in QLabel(image_display)         
             
 
-
+        # Screenshot-Button aktivieren, wenn Frame vorhanden
         if not self.current_frame is None:
             self.btn_screenshot.setEnabled(True)
         else:
             self.btn_screenshot.setEnabled(False)
-
-
         self.current_frame = cv2.cvtColor(self.current_frame, cv2.COLOR_RGB2BGR) # OpenCV (standard) BGR, Umwandlung in RGB
-
-         # Zeichne grüne Rechtecke um erkannte Gesichter
+        # Zeichne grüne Rechtecke um erkannte Gesichter
         for (x, y, w, h) in objects:
             cv2.rectangle(self.current_frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
-
         pass
 
 
