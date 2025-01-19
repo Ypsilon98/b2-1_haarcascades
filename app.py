@@ -591,6 +591,7 @@ class App(QMainWindow):
             self.camera_selector.setEnabled(False)
             self.mode_selector.setEnabled(False)
             self.classifier_selector.setEnabled(False)
+            self.btn_screenshot.setEnabled(True)
             self.btn_start_camera.setProperty("status","stop")
             self.btn_start_camera.style().unpolish(self.btn_start_camera)  # Reset style
             self.btn_start_camera.style().polish(self.btn_start_camera)    # Reapply style
@@ -615,6 +616,7 @@ class App(QMainWindow):
             self.camera_selector.setEnabled(True)
             self.mode_selector.setEnabled(True)
             self.classifier_selector.setEnabled(True)
+            self.btn_screenshot.setEnabled(False)
             self.btn_start_camera.setProperty("status","start") # Setzt Property für Style zurück
             self.btn_start_camera.style().unpolish(self.btn_start_camera) # Zurücksetzen des Styles 
             self.btn_start_camera.style().polish(self.btn_start_camera) # Neuanwenden des Styles
@@ -624,7 +626,7 @@ class App(QMainWindow):
             self.timer.stop() # Timer stoppen(keine Frames mehr aktualisieren)
             self.num_objects = 0 # Anzahl der erkannten Objekte auf 0 zurücksetzen
             self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
-
+            self.current_frame = None # Bild löschen
             self.image_display.clear()  # Bildanzeige leeren
             self.image_display.setText("Anzeigebereich für Bilder/Kamera")  # Optionale Standardnachricht
             self.status.showMessage("Kamera gestoppt.") # Statusnachricht in Statusleiste
@@ -687,7 +689,7 @@ class App(QMainWindow):
             self.camera_selector.setEnabled(True)
             self.classifier_selector.setEnabled(True)
             self.mode_selector.setEnabled(True)
-
+            
             self.btn_load_image.setProperty("status","start")
             self.btn_load_image.style().unpolish(self.btn_load_image)  
             self.btn_load_image.style().polish(self.btn_load_image)   
@@ -695,6 +697,7 @@ class App(QMainWindow):
             self.status.showMessage("Bild wird zurückgesetzt...")
             self.static_image = None # Bild löschen
             self.timer.stop() # Timer stoppen (keine Frames mehr aktualisieren)
+            self.btn_screenshot.setEnabled(False)
             self.image_display.clear() # Bildanzeige leeren
             self.image_display.setText("Anzeigebereich für Bilder/Kamera")
             self.num_objects = 0 # Anzahl der erkannten Objekte auf 0 zurücksetzen
