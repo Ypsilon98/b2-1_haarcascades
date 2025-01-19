@@ -308,7 +308,7 @@ class App(QMainWindow):
 
         # Kameraliste bei Programmstart aktualisieren
         self.btn_refresh_cameras.click() # Simuliert Klick des Kameras aktualisieren Buttons
-        self.change_mode(self.mode_selector.currentText()) # Modus basierend auf Auswahl initialisieren
+        #self.change_mode(self.mode_selector.currentText()) # Modus basierend auf Auswahl initialisieren
 
     # Animiert die Haar Cascade Features
     def animation(self):
@@ -443,15 +443,21 @@ class App(QMainWindow):
         """
         try:
             if text == "live":
-                self.btn_start_camera.setEnabled(True)
-                self.btn_start_camera.setProperty("status","start")
-                self.btn_start_camera.style().unpolish(self.btn_start_camera) 
-                self.btn_start_camera.style().polish(self.btn_start_camera)    
-                self.btn_load_image.setEnabled(False)
-                self.btn_load_image.setProperty("status","unavailable")
-                self.btn_load_image.style().unpolish(self.btn_load_image)
-                self.btn_load_image.style().polish(self.btn_load_image)
-                self.status.showMessage("Modus auf Live-Kamera geändert.")
+                available_cameras = self.camera_manager.detect_cameras()
+                if available_cameras:
+                    self.btn_start_camera.setEnabled(True)
+                    self.btn_start_camera.setProperty("status","start")
+                    self.btn_start_camera.style().unpolish(self.btn_start_camera) 
+                    self.btn_start_camera.style().polish(self.btn_start_camera)    
+                    self.btn_load_image.setEnabled(False)
+                    self.btn_load_image.setProperty("status","unavailable")
+                    self.btn_load_image.style().unpolish(self.btn_load_image)
+                    self.btn_load_image.style().polish(self.btn_load_image)
+                    self.status.showMessage("Modus auf Live-Kamera geändert.")
+                else:
+                    self.status.showMessage("Keine Kamera erkannt.")
+                    print("Keine Kamera erkannt.")
+
             elif text == "file":
                 self.btn_start_camera.setEnabled(False)
                 self.btn_start_camera.setProperty("status", "unavailable")
