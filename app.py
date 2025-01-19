@@ -658,7 +658,7 @@ class App(QMainWindow):
             self.current_frame = frame
 
             # Objekterkennung
-            objects = self.classifier_manager.detect_faces(frame)
+            objects = self.classifier_manager.detect_faces(frame, self.classifier_manager.current_classifier)
             self.num_objects = len(objects) # Anzahl der erkannten Objekte
             self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
                 
@@ -692,7 +692,7 @@ class App(QMainWindow):
             self.current_frame = frame
 
             # Objekterkennung
-            objects = self.classifier_manager.detect_faces(frame)
+            objects = self.classifier_manager.detect_faces(frame, self.classifier_manager.current_classifier)
             self.num_objects = len(objects) # Anzahl der erkannten Objekte
             self.object_count_label.setText(f"<a style=\"text-decoration:none;\" href=\"http://www.easteregg.com\"> {self.num_objects} </a>")
                 

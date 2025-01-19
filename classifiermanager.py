@@ -120,7 +120,7 @@ class ClassifierManager:
         pass
 
 
-    # Erkennt Gesichter in einem gegebenen Frame.
+    # Erkennt Objekte in einem gegebenen Frame.
     def detect_faces(self, frame, classifier_id = "face"):
         
         try:
