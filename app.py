@@ -193,12 +193,14 @@ class App(QMainWindow):
         scaleFactor_layout = QHBoxLayout()
         self.label_custom_scaleFactor = QLabel("scaleFactor:")
         self.slider_custom_scaleFactor = QSlider(Qt.Orientation.Horizontal)
+        self.slider_custom_scaleFactor.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.slider_custom_scaleFactor.setRange(10, 30)  # Range from 1.0 to 3.0 (multiplied by 10)
         self.slider_custom_scaleFactor.setValue(1.05)  # Default value 1.2
         self.label_custom_scaleFactor.setText(f"scaleFactor: {self.slider_custom_scaleFactor.value()/10}")
         self.slider_custom_scaleFactor.valueChanged.connect(self.update_scaleFactor)
         self.slider_custom_scaleFactor.setSingleStep(1)
         self.slider_custom_scaleFactor.setEnabled(False)
+        
         scaleFactor_layout.addWidget(self.label_custom_scaleFactor)
         scaleFactor_layout.addWidget(self.slider_custom_scaleFactor)
         slider_layout.addLayout(scaleFactor_layout)
@@ -207,6 +209,7 @@ class App(QMainWindow):
         minNeighbors_layout = QHBoxLayout()
         self.label_custom_minNeighbors = QLabel("minNeighbors:")
         self.slider_custom_minNeighbors = QSlider(Qt.Orientation.Horizontal)
+        self.slider_custom_minNeighbors.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.slider_custom_minNeighbors.setRange(1, 20)  # Range from 1 to 10
         self.slider_custom_minNeighbors.setValue(3)  # Default value 3
         self.label_custom_minNeighbors.setText(f"minNeighbors: {self.slider_custom_minNeighbors.value()}")
@@ -221,6 +224,7 @@ class App(QMainWindow):
         minSize_layout = QHBoxLayout()
         self.label_custom_minSize = QLabel("minSize:")
         self.slider_custom_minSize = QSlider(Qt.Orientation.Horizontal)
+        self.slider_custom_minSize.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed) 
         self.slider_custom_minSize.setRange(20, 200)  # Range from 20 to 200 pixels
         self.slider_custom_minSize.setValue(30)  # Default value 30 pixels
         self.label_custom_minSize.setText(f"minSize: {self.slider_custom_minSize.value()}")
@@ -661,7 +665,6 @@ class App(QMainWindow):
             # Zeichne grüne Rechtecke um erkannte Gesichter
             for (x, y, w, h) in objects:
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2) # Zeichne grünes Rechteck um Objekt
-            
             
 
             height, width, channel = frame.shape # Größe des Frames
