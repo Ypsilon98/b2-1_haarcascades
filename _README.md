@@ -33,3 +33,20 @@ QT_QPA_PLATFORM=xcb python main.py #Linux
 
 
 
+requirements:
+numpy==2.2.2
+opencv-python==4.11.0.86
+packaging==24.2
+pillow==11.1.0
+pip-review==1.3.0
+PyQt6==6.8.0
+PyQt6-Qt6==6.8.1
+PyQt6_sip==13.9.1
+PySide6==6.8.1.1
+PySide6_Addons==6.8.1.1
+PySide6_Essentials==6.8.1.1
+shiboken6==6.8.1.1
+Tcl==0.2
+tk==0.1.0
+
+Tcl-tk muss min. Version 8.6.x haben, sonst führt dies bei tkinter zu Bugs und Fehlern (unter macOS)
