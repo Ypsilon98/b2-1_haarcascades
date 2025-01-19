@@ -80,7 +80,7 @@ class App(QMainWindow):
             except:
                 pass
             try:
-                self.load_stylesheet("b2-1_haarcascades/style_sheet.css")
+                self.load_stylesheet("b2-1_haarcascades/style_sheet.css") 
             except:
                 pass
             self.i2 = cv2.imread("face_animation.jpg")

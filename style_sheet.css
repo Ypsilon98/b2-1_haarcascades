@@ -106,6 +106,7 @@ QSlider {
     background: transparent;
 }
 
+
 /* Laufbahn des Sliders */
 QSlider::groove:horizontal {
     height: 6px;
@@ -123,13 +124,16 @@ QSlider::handle:horizontal {
 }
 
 /* Farbe der Laufbahn vor Schieberegler */
-QSlider::sub-page:horizontal {
+QSlider::sub-page:horizontal:enabled {
     background: #0078D7; /* Microsoft Blue */
-    border-radius: 3px;
+}
+
+/* Farbe der Laufbahn vor Schieberegler wenn deaktiviert*/
+QSlider::sub-page:horizontal:disabled {
+    background: gray; 
 }
 
 /* Farbe der Laufbahn nach Schieberegler */
 QSlider::add-page:horizontal {
     background: gray;
-    border-radius: 3px;
 }
