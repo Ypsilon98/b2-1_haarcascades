@@ -1,6 +1,6 @@
 import cv2
 import os
-from PySide6.QtWidgets import QMainWindow, QWidget, QPushButton, QLabel, QComboBox, QStatusBar, QMessageBox
+from PySide6.QtWidgets import QMainWindow, QWidget, QPushButton, QLabel, QComboBox, QStatusBar, QMessageBox, QSlider
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QSizePolicy 
 from PySide6.QtGui import QPixmap, QImage , QPainter, QColor, QAction
 from PySide6.QtCore import QTimer, Qt, QRect
@@ -187,6 +187,52 @@ class App(QMainWindow):
         classifier_layout.addWidget(self.classifier_selector)
         buttons_layout.addLayout(classifier_layout)
 
+        slider_layout = QVBoxLayout()
+
+        # scaleFactor Slider
+        scaleFactor_layout = QHBoxLayout()
+        self.label_custom_scaleFactor = QLabel("scaleFactor:")
+        self.slider_custom_scaleFactor = QSlider(Qt.Orientation.Horizontal)
+        self.slider_custom_scaleFactor.setRange(10, 30)  # Range from 1.0 to 3.0 (multiplied by 10)
+        self.slider_custom_scaleFactor.setValue(12)  # Default value 1.2
+        self.label_custom_scaleFactor.setText(f"scaleFactor: {self.slider_custom_scaleFactor.value()}")
+        self.slider_custom_scaleFactor.valueChanged.connect(self.update_scaleFactor)
+        self.slider_custom_scaleFactor.setSingleStep(1)
+        self.slider_custom_scaleFactor.setEnabled(False)
+        scaleFactor_layout.addWidget(self.label_custom_scaleFactor)
+        scaleFactor_layout.addWidget(self.slider_custom_scaleFactor)
+        slider_layout.addLayout(scaleFactor_layout)
+
+        # minNeighbors Slider
+        minNeighbors_layout = QHBoxLayout()
+        self.label_custom_minNeighbors = QLabel("minNeighbors:")
+        self.slider_custom_minNeighbors = QSlider(Qt.Orientation.Horizontal)
+        self.slider_custom_minNeighbors.setRange(1, 20)  # Range from 1 to 10
+        self.slider_custom_minNeighbors.setValue(3)  # Default value 3
+        self.label_custom_minNeighbors.setText(f"minNeighbors: {self.slider_custom_minNeighbors.value()}")
+        self.slider_custom_minNeighbors.valueChanged.connect(self.update_minNeighbors)
+        self.slider_custom_minNeighbors.setSingleStep(1)
+        self.slider_custom_minNeighbors.setEnabled(False)
+        minNeighbors_layout.addWidget(self.label_custom_minNeighbors)
+        minNeighbors_layout.addWidget(self.slider_custom_minNeighbors)
+        slider_layout.addLayout(minNeighbors_layout)
+
+        # minSize Slider
+        minSize_layout = QHBoxLayout()
+        self.label_custom_minSize = QLabel("minSize:")
+        self.slider_custom_minSize = QSlider(Qt.Orientation.Horizontal)
+        self.slider_custom_minSize.setRange(20, 200)  # Range from 20 to 200 pixels
+        self.slider_custom_minSize.setValue(30)  # Default value 30 pixels
+        self.label_custom_minSize.setText(f"minSize: {self.slider_custom_minSize.value()}")
+        self.slider_custom_minSize.valueChanged.connect(self.update_minSize)
+        self.slider_custom_minSize.setSingleStep(5)
+        self.slider_custom_minSize.setEnabled(False)
+        minSize_layout.addWidget(self.label_custom_minSize)
+        minSize_layout.addWidget(self.slider_custom_minSize)
+        slider_layout.addLayout(minSize_layout)
+
+        buttons_layout.addLayout(slider_layout)
+
         # Label zur Anzeige des Namens der benutzerdefinierten Klassifizierer-XML-Datei
         self.custom_classifier_label = QLabel("")
         buttons_layout.addWidget(self.custom_classifier_label)
@@ -371,24 +417,47 @@ class App(QMainWindow):
     
     def change_classifier(self, text):
         self.btn_choose_classifier.setEnabled(False)
+        self.slider_custom_scaleFactor.setEnabled(False)
+        self.slider_custom_minNeighbors.setEnabled(False)
+        self.slider_custom_minSize.setEnabled(False)
         self.custom_classifier_label.setText("")
         if text == "face":
-            self.classifier_manager.load_classifier("face")
+            self.load_predefined_classifier("face")
         elif text == "eye":
-            self.classifier_manager.load_classifier("eye")
+            self.load_predefined_classifier("eye")
         elif text == "smile":
-            self.classifier_manager.load_classifier("smile")
+            self.load_predefined_classifier("smile")
         elif text == "upperbody":
-            self.classifier_manager.load_classifier("upperbody")
+            self.load_predefined_classifier("upperbody")
         elif text == "fullbody":
-            self.classifier_manager.load_classifier("fullbody")
+            self.load_predefined_classifier("fullbody")
         elif text == "profileface":
-            self.classifier_manager.load_classifier("profileface")
+            self.load_predefined_classifier("profileface")
         elif text == "Eigener Klassifizierer":
+            self.classifier_manager.current_classifier ="custom"
             self.btn_choose_classifier.setEnabled(True)
+            self.slider_custom_scaleFactor.setEnabled(True)
+            self.slider_custom_minNeighbors.setEnabled(True)
+            self.slider_custom_minSize.setEnabled(True)
             self.custom_classifier_label.setText("Datei auswählen...")
         else:
             self.classifier_manager.load_classifier("face")
+        pass
+
+    def load_predefined_classifier(self, classifier_id):
+        self.classifier_manager.load_classifier(classifier_id)
+        self.slider_custom_scaleFactor.blockSignals(True)
+        self.slider_custom_minNeighbors.blockSignals(True)
+        self.slider_custom_minSize.blockSignals(True)
+        self.slider_custom_scaleFactor.setValue(int(self.classifier_manager.classifiers[classifier_id]["scaleFactor"]*10))
+        self.label_custom_scaleFactor.setText(f"scaleFactor: {self.classifier_manager.classifiers[classifier_id]['scaleFactor']}")
+        self.slider_custom_minNeighbors.setValue(self.classifier_manager.classifiers[classifier_id]["minNeighbors"])
+        self.label_custom_minNeighbors.setText(f"minNeighbors: {self.classifier_manager.classifiers[classifier_id]['minNeighbors']}")
+        self.slider_custom_minSize.setValue(self.classifier_manager.classifiers[classifier_id]["minSize"][0])
+        self.label_custom_minSize.setText(f"minSize: {self.classifier_manager.classifiers[classifier_id]['minSize'][0]}")
+        self.slider_custom_scaleFactor.blockSignals(False)
+        self.slider_custom_minNeighbors.blockSignals(False)
+        self.slider_custom_minSize.blockSignals(False)
         pass
 
     def load_custom_classifier(self):
@@ -553,6 +622,23 @@ class App(QMainWindow):
             self.status.showMessage("Fehler: Screenshot konnte nicht gespeichert werden.")
         pass
 
+    # Aktualisiert den scaleFactor des Klassifizierers basierend auf dem Slider-Wert.
+    def update_scaleFactor(self, value):
+        self.classifier_manager.update_scaleFactor(value/10)
+        self.label_custom_scaleFactor.setText(f"scaleFactor: {value/10}")
+        pass
+
+    # Aktualisiert den minNeighbors des Klassifizierers basierend auf dem Slider-Wert.
+    def update_minNeighbors(self, value):
+        self.classifier_manager.update_minNeighbors(value)
+        self.label_custom_minNeighbors.setText(f"minNeighbors: {value}")
+        pass
+
+    # Aktualisiert den minSize des Klassifizierers basierend auf dem Slider-Wert.
+    def update_minSize(self, value):
+        self.classifier_manager.update_minSize(value)
+        self.label_custom_minSize.setText(f"minSize: {value}")
+        pass
 
     # Holt ein Frame von der Kamera und zeigt es in der GUI an. 
     def update_frame(self):

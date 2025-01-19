@@ -8,17 +8,62 @@ class ClassifierManager:
         
         self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
         self.file_manager = FileManager()
+        self.current_classifier = "face"
 
         # Dictionary für native OpenCV-Klassifizierer
         self.classifiers = {
-            "face": "haarcascade_frontalface_default.xml",
-            "eye": "haarcascade_eye.xml",
-            "smile": "haarcascade_smile.xml",
-            "upperbody": "haarcascade_upperbody.xml",
-            "fullbody": "haarcascade_fullbody.xml",
-            "profileface": "haarcascade_profileface.xml"
+            "face": {
+            "file": "haarcascade_frontalface_default.xml",
+            "scaleFactor": 1.05,
+            "minNeighbors": 3,
+            "minSize": (30, 30)
+            },
+            "eye": {
+            "file": "haarcascade_eye.xml",
+            "scaleFactor": 1.1,
+            "minNeighbors": 5,
+            "minSize": (20, 20)
+            },
+            "smile": {
+            "file": "haarcascade_smile.xml",
+            "scaleFactor": 1.1,
+            "minNeighbors": 15,
+            "minSize": (25, 25)
+            },
+            "upperbody": {
+            "file": "haarcascade_upperbody.xml",
+            "scaleFactor": 1.05,
+            "minNeighbors": 3,
+            "minSize": (50, 50)
+            },
+            "fullbody": {
+            "file": "haarcascade_fullbody.xml",
+            "scaleFactor": 1.05,
+            "minNeighbors": 3,
+            "minSize": (50, 50)
+            },
+            "profileface": {
+            "file": "haarcascade_profileface.xml",
+            "scaleFactor": 1.1,
+            "minNeighbors": 3,
+            "minSize": (30, 30)
+            },
+            "custom": {
+            "file": "",
+            "scaleFactor": 1.05,
+            "minNeighbors": 3,
+            "minSize": (30, 30)
+            }
         }
 
+    def update_scaleFactor(self, value):
+        self.classifiers["custom"]["scaleFactor"] = value
+    
+    def update_minNeighbors(self, value):
+        self.classifiers["custom"]["minNeighbors"] = value
+
+    def update_minSize(self, value):
+        self.classifiers["custom"]["minSize"] = (value, value)
 
     # Lädt eine Haar-Cascade XML-Datei zum Erkennen von Gesichtern.
     def load_custom_classifier(self):
@@ -49,18 +94,23 @@ class ClassifierManager:
             return "Ungültige ID!"
 
         # Den Dateipfad für den gewünschten Klassifizierer erstellen
-        classifier_path = cv2.data.haarcascades + self.classifiers[classifier_id]
-        print(f"Lade Klassifizierer '{self.classifiers[classifier_id]}'...")
+        classifier_info = self.classifiers[classifier_id]
+        classifier_path = cv2.data.haarcascades + classifier_info["file"]
+        print(f"Lade Klassifizierer '{classifier_info['file']}'...")
 
         # Versuchen, den Klassifizierer zu laden
-        self.face_cascade = cv2.CascadeClassifier(classifier_path)
-        if self.face_cascade.empty():
+        try:
+            self.face_cascade = cv2.CascadeClassifier(classifier_path)
+            self.current_classifier = classifier_id
+    
+        except cv2.error as e:
             self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-            print(f"Laden des Klassifizierers '{self.classifiers[classifier_id]}' fehlgeschlagen")
+            self.current_classifier = "face"
+            print(f"Laden des Klassifizierers '{classifier_info['file']}' fehlgeschlagen")
             return "Laden fehlgeschlagen! Standard wird zurückgesetzt"
 
-        print(f"Klassifizierer '{self.classifiers[classifier_id]}' erfolgreich geladen.")
-        return self.classifiers[classifier_id]
+        print(f"Klassifizierer '{classifier_info['file']}' erfolgreich geladen.")
+        return classifier_info["file"]
 
 
 
@@ -71,9 +121,23 @@ class ClassifierManager:
 
 
     # Erkennt Gesichter in einem gegebenen Frame.
-    def detect_faces(self, frame):
+    def detect_faces(self, frame, classifier_id = "face"):
         
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = self.face_cascade.detectMultiScale(gray, scaleFactor=1.05, minNeighbors=3, minSize=(30, 30))
-        return faces
+        try:
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            classifier_info = self.classifiers[classifier_id]
+            objects = self.face_cascade.detectMultiScale(
+                gray, 
+                scaleFactor=classifier_info["scaleFactor"], 
+                minNeighbors=classifier_info["minNeighbors"], 
+                minSize=classifier_info["minSize"]
+            )
+            #print(f"{classifier_info['scaleFactor']}, {classifier_info['minNeighbors']}, {classifier_info['minSize']}")
+            return objects
+        
+        except cv2.error as e:
+            #print(f"Fehler beim Erkennen von Objekten: {e}")
+            return None
+        
+        
 
